@@ -71,9 +71,10 @@
 {% endblock %}
 
 {% block extra_scripts %}
+{{ summary|json_script:"summary-data" }}
 <script>
 (function() {
-    const data = {{ summary_json|safe }};
+    const data = JSON.parse(document.getElementById("summary-data").textContent);
 
     const ctxRisk = document.getElementById("statsRiskLevels");
     if (ctxRisk) {

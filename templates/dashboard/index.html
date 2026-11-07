@@ -171,7 +171,7 @@
 </div>
 {% endif %}
 
-{% if summary.is_admin_view or summary.active_models %}
+{% if summary.is_admin_view %}
 <!-- Блок активных версий моделей с метриками из метаданных (Задание 17 п. 8) -->
 <div class="sg-card p-4 mb-2">
     <h2 class="h6 fw-bold mb-3">🤖 Активные версии ML-моделей и метрики качества</h2>
@@ -205,9 +205,10 @@
 
 {% block extra_scripts %}
 {% if summary.total_checks > 0 %}
+{{ summary|json_script:"summary-data" }}
 <script>
 (function() {
-    const summaryData = {{ summary_json|safe }};
+    const summaryData = JSON.parse(document.getElementById("summary-data").textContent);
 
     // 1. Круговая диаграмма распределения категорий
     const ctxCat = document.getElementById("chartCategories");
