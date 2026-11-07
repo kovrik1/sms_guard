@@ -1,0 +1,425 @@
+{
+  "model_type": "url",
+  "version": "1.0.0",
+  "algorithm": "HistGradientBoosting",
+  "best_params": {
+    "learning_rate": 0.05,
+    "max_depth": 10,
+    "max_iter": 250
+  },
+  "all_best_params": {
+    "LogisticRegression": {
+      "clf__C": 10.0
+    },
+    "RandomForest": {
+      "max_depth": 20,
+      "n_estimators": 250
+    },
+    "HistGradientBoosting": {
+      "learning_rate": 0.05,
+      "max_depth": 10,
+      "max_iter": 250
+    }
+  },
+  "feature_names": [
+    "url_length",
+    "domain_length",
+    "path_length",
+    "num_dots",
+    "num_subdomains",
+    "num_hyphens_domain",
+    "num_digits_url",
+    "digit_ratio_domain",
+    "num_special_chars",
+    "has_ip_address",
+    "is_https",
+    "has_non_standard_port",
+    "has_at_symbol",
+    "has_double_slash_in_path",
+    "is_shortener",
+    "num_suspicious_words",
+    "has_punycode",
+    "has_mixed_scripts",
+    "brand_similarity",
+    "domain_entropy",
+    "is_suspicious_tld",
+    "num_query_params"
+  ],
+  "num_features": 22,
+  "threshold": 0.51,
+  "t1": 0.35,
+  "t2": 0.51,
+  "thresholds": {
+    "t1": 0.35,
+    "t2": 0.51,
+    "safe_max": 0.35,
+    "dangerous_min": 0.51
+  },
+  "threshold_rationale": {
+    "t1": 0.35,
+    "t2": 0.51,
+    "t1_val_recall": 0.957,
+    "t1_val_precision": 0.9268,
+    "t2_val_recall": 0.9497,
+    "t2_val_precision": 0.9368,
+    "t2_val_f1": 0.9432,
+    "t2_val_f2": 0.9471,
+    "description": "SAFE: P < 0.35 (низкий риск); SUSPICIOUS: 0.35 <= P < 0.51 (требует осторожности); DANGEROUS: P >= 0.51 (высокая точность обнаружения фишинга)."
+  },
+  "validation_comparison": {
+    "LogisticRegression": {
+      "threshold": 0.5,
+      "accuracy": 0.8349,
+      "precision": 0.8097,
+      "recall": 0.8147,
+      "f1": 0.8122,
+      "f2": 0.8137,
+      "roc_auc": 0.8886,
+      "pr_auc": 0.8895,
+      "train_time_sec": 2.747,
+      "latency_ms_per_url": 1.4004,
+      "confusion_matrix": {
+        "tn": 3887,
+        "fp": 682,
+        "fn": 660,
+        "tp": 2901
+      }
+    },
+    "RandomForest": {
+      "threshold": 0.5,
+      "accuracy": 0.9419,
+      "precision": 0.932,
+      "recall": 0.9357,
+      "f1": 0.9339,
+      "f2": 0.935,
+      "roc_auc": 0.9749,
+      "pr_auc": 0.9725,
+      "train_time_sec": 7.614,
+      "latency_ms_per_url": 106.0401,
+      "confusion_matrix": {
+        "tn": 4326,
+        "fp": 243,
+        "fn": 229,
+        "tp": 3332
+      }
+    },
+    "HistGradientBoosting": {
+      "threshold": 0.5,
+      "accuracy": 0.9497,
+      "precision": 0.9361,
+      "recall": 0.95,
+      "f1": 0.943,
+      "f2": 0.9472,
+      "roc_auc": 0.9807,
+      "pr_auc": 0.9797,
+      "train_time_sec": 10.727,
+      "latency_ms_per_url": 23.964,
+      "confusion_matrix": {
+        "tn": 4338,
+        "fp": 231,
+        "fn": 178,
+        "tp": 3383
+      }
+    }
+  },
+  "val_metrics": {
+    "threshold": 0.51,
+    "accuracy": 0.9499,
+    "precision": 0.9368,
+    "recall": 0.9497,
+    "f1": 0.9432,
+    "f2": 0.9471,
+    "roc_auc": 0.9807,
+    "pr_auc": 0.9797,
+    "train_time_sec": 10.727,
+    "latency_ms_per_url": 23.964,
+    "confusion_matrix": {
+      "tn": 4341,
+      "fp": 228,
+      "fn": 179,
+      "tp": 3382
+    }
+  },
+  "test_metrics": {
+    "threshold": 0.51,
+    "accuracy": 0.9466,
+    "precision": 0.9479,
+    "recall": 0.9363,
+    "f1": 0.9421,
+    "f2": 0.9386,
+    "roc_auc": 0.9788,
+    "pr_auc": 0.9804,
+    "train_time_sec": 10.727,
+    "latency_ms_per_url": 23.964,
+    "confusion_matrix": {
+      "tn": 4491,
+      "fp": 209,
+      "fn": 259,
+      "tp": 3805
+    }
+  },
+  "feature_importance": {
+    "random_forest_top10": [
+      {
+        "feature": "path_length",
+        "importance": 0.23079
+      },
+      {
+        "feature": "is_https",
+        "importance": 0.1462
+      },
+      {
+        "feature": "num_digits_url",
+        "importance": 0.12187
+      },
+      {
+        "feature": "url_length",
+        "importance": 0.08643
+      },
+      {
+        "feature": "digit_ratio_domain",
+        "importance": 0.07857
+      },
+      {
+        "feature": "domain_length",
+        "importance": 0.07713
+      },
+      {
+        "feature": "domain_entropy",
+        "importance": 0.06054
+      },
+      {
+        "feature": "num_subdomains",
+        "importance": 0.05827
+      },
+      {
+        "feature": "num_dots",
+        "importance": 0.04112
+      },
+      {
+        "feature": "num_hyphens_domain",
+        "importance": 0.0319
+      }
+    ],
+    "logistic_regression_top10": [
+      {
+        "feature": "url_length",
+        "abs_coef": 11.49457,
+        "signed_coef": 11.49457
+      },
+      {
+        "feature": "num_digits_url",
+        "abs_coef": 7.11393,
+        "signed_coef": 7.11393
+      },
+      {
+        "feature": "path_length",
+        "abs_coef": 4.72562,
+        "signed_coef": -4.72562
+      },
+      {
+        "feature": "num_query_params",
+        "abs_coef": 2.78754,
+        "signed_coef": -2.78754
+      },
+      {
+        "feature": "domain_length",
+        "abs_coef": 2.31262,
+        "signed_coef": -2.31262
+      },
+      {
+        "feature": "has_at_symbol",
+        "abs_coef": 1.61674,
+        "signed_coef": 1.61674
+      },
+      {
+        "feature": "is_shortener",
+        "abs_coef": 1.55231,
+        "signed_coef": 1.55231
+      },
+      {
+        "feature": "is_suspicious_tld",
+        "abs_coef": 1.29227,
+        "signed_coef": 1.29227
+      },
+      {
+        "feature": "has_ip_address",
+        "abs_coef": 1.27469,
+        "signed_coef": 1.27469
+      },
+      {
+        "feature": "is_https",
+        "abs_coef": 1.14463,
+        "signed_coef": -1.14463
+      }
+    ]
+  },
+  "synthetic_20_evaluation": {
+    "total": 20,
+    "matched": 20,
+    "results": [
+      {
+        "url": "https://www.example.com/about",
+        "expected_category": "SAFE",
+        "p_url": 0.0128,
+        "predicted_category": "SAFE",
+        "match": true
+      },
+      {
+        "url": "https://kaspi.kz",
+        "expected_category": "SAFE",
+        "p_url": 0.0214,
+        "predicted_category": "SAFE",
+        "match": true
+      },
+      {
+        "url": "https://egov.kz",
+        "expected_category": "SAFE",
+        "p_url": 0.0214,
+        "predicted_category": "SAFE",
+        "match": true
+      },
+      {
+        "url": "https://halykbank.kz/ru/cards",
+        "expected_category": "SAFE",
+        "p_url": 0.0103,
+        "predicted_category": "SAFE",
+        "match": true
+      },
+      {
+        "url": "https://www.google.com/search?q=python",
+        "expected_category": "SAFE",
+        "p_url": 0.0055,
+        "predicted_category": "SAFE",
+        "match": true
+      },
+      {
+        "url": "https://kazpost.kz/ru/tracking",
+        "expected_category": "SAFE",
+        "p_url": 0.0384,
+        "predicted_category": "SAFE",
+        "match": true
+      },
+      {
+        "url": "https://jusan.kz/about",
+        "expected_category": "SAFE",
+        "p_url": 0.0525,
+        "predicted_category": "SAFE",
+        "match": true
+      },
+      {
+        "url": "https://forte.kz/credits",
+        "expected_category": "SAFE",
+        "p_url": 0.0177,
+        "predicted_category": "SAFE",
+        "match": true
+      },
+      {
+        "url": "https://bcc.kz/personal",
+        "expected_category": "SAFE",
+        "p_url": 0.211,
+        "predicted_category": "SAFE",
+        "match": true
+      },
+      {
+        "url": "https://www.wikipedia.org/wiki/Main_Page",
+        "expected_category": "SAFE",
+        "p_url": 0.0038,
+        "predicted_category": "SAFE",
+        "match": true
+      },
+      {
+        "url": "http://secure-bank-verify.example/login",
+        "expected_category": "DANGEROUS",
+        "p_url": 0.9578,
+        "predicted_category": "DANGEROUS",
+        "match": true
+      },
+      {
+        "url": "http://192.0.2.15/account-update",
+        "expected_category": "DANGEROUS",
+        "p_url": 0.9989,
+        "predicted_category": "DANGEROUS",
+        "match": true
+      },
+      {
+        "url": "bit.ly/prize-claim-test",
+        "expected_category": "DANGEROUS",
+        "p_url": 1.0,
+        "predicted_category": "DANGEROUS",
+        "match": true
+      },
+      {
+        "url": "http://bank-kz-verify.test",
+        "expected_category": "DANGEROUS",
+        "p_url": 0.9975,
+        "predicted_category": "DANGEROUS",
+        "match": true
+      },
+      {
+        "url": "http://post-delivery-pay.example",
+        "expected_category": "DANGEROUS",
+        "p_url": 0.9614,
+        "predicted_category": "DANGEROUS",
+        "match": true
+      },
+      {
+        "url": "http://xn--exmplecua.test/secure/login?verify=1",
+        "expected_category": "DANGEROUS",
+        "p_url": 0.9994,
+        "predicted_category": "DANGEROUS",
+        "match": true
+      },
+      {
+        "url": "http://kaspi-bonus-prize.xyz/claim",
+        "expected_category": "DANGEROUS",
+        "p_url": 0.9991,
+        "predicted_category": "DANGEROUS",
+        "match": true
+      },
+      {
+        "url": "http://halyk-security-update.top/verify/card",
+        "expected_category": "DANGEROUS",
+        "p_url": 0.9998,
+        "predicted_category": "DANGEROUS",
+        "match": true
+      },
+      {
+        "url": "http://user@evil-login-pay.click:8080//confirm",
+        "expected_category": "DANGEROUS",
+        "p_url": 1.0,
+        "predicted_category": "DANGEROUS",
+        "match": true
+      },
+      {
+        "url": "http://egov-payout-bonus.icu/wallet/unlock",
+        "expected_category": "DANGEROUS",
+        "p_url": 0.9998,
+        "predicted_category": "DANGEROUS",
+        "match": true
+      }
+    ]
+  },
+  "dataset_summary": {
+    "total_rows": 61607,
+    "split_counts": {
+      "train": 44713,
+      "val": 8130,
+      "test": 8764
+    },
+    "unique_domains": {
+      "train": 31833,
+      "val": 6821,
+      "test": 6822,
+      "overlap_train_val": 0,
+      "overlap_train_test": 0,
+      "overlap_val_test": 0
+    },
+    "artifact_mitigation": {
+      "www_removed": 13391,
+      "scheme_to_http": 5975,
+      "safe_path_added": 16403
+    }
+  },
+  "trained_at": "2026-11-07T07:25:04.956792+00:00"
+}
