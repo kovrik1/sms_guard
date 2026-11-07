@@ -1,0 +1,376 @@
+{
+  "total_clean": 5100,
+  "ham_count": 4501,
+  "spam_count": 599,
+  "ham_pct": 88.25,
+  "spam_pct": 11.75,
+  "imbalance_ratio": 7.51,
+  "char_length": {
+    "ham_mean": 71.1,
+    "ham_median": 53.0,
+    "ham_std": 56.59,
+    "spam_mean": 137.67,
+    "spam_median": 148.0,
+    "spam_std": 29.91
+  },
+  "word_length": {
+    "ham_mean": 14.28,
+    "ham_median": 11.0,
+    "spam_mean": 23.76,
+    "spam_median": 25.0
+  },
+  "token_shares_pct": {
+    "url": {
+      "ham": 0.27,
+      "spam": 17.36
+    },
+    "phone": {
+      "ham": 0.02,
+      "spam": 54.42
+    },
+    "money": {
+      "ham": 0.27,
+      "spam": 33.56
+    },
+    "exclamation": {
+      "ham": 11.78,
+      "spam": 46.91
+    },
+    "num": {
+      "ham": 15.73,
+      "spam": 87.31
+    }
+  },
+  "caps_ratio_pct": {
+    "ham_mean": 7.63,
+    "spam_mean": 16.66
+  },
+  "top_20_words_ham": [
+    [
+      "your",
+      381
+    ],
+    [
+      "get",
+      301
+    ],
+    [
+      "up",
+      288
+    ],
+    [
+      "ok",
+      251
+    ],
+    [
+      "go",
+      248
+    ],
+    [
+      "ll",
+      231
+    ],
+    [
+      "got",
+      228
+    ],
+    [
+      "know",
+      226
+    ],
+    [
+      "like",
+      224
+    ],
+    [
+      "good",
+      217
+    ],
+    [
+      "come",
+      215
+    ],
+    [
+      "out",
+      206
+    ],
+    [
+      "am",
+      204
+    ],
+    [
+      "ur",
+      203
+    ],
+    [
+      "time",
+      193
+    ],
+    [
+      "day",
+      191
+    ],
+    [
+      "call",
+      189
+    ],
+    [
+      "love",
+      186
+    ],
+    [
+      "going",
+      164
+    ],
+    [
+      "want",
+      162
+    ]
+  ],
+  "top_20_words_spam": [
+    [
+      "call",
+      278
+    ],
+    [
+      "your",
+      221
+    ],
+    [
+      "free",
+      183
+    ],
+    [
+      "txt",
+      130
+    ],
+    [
+      "stop",
+      115
+    ],
+    [
+      "ur",
+      113
+    ],
+    [
+      "text",
+      105
+    ],
+    [
+      "mobile",
+      101
+    ],
+    [
+      "reply",
+      91
+    ],
+    [
+      "claim",
+      87
+    ],
+    [
+      "prize",
+      70
+    ],
+    [
+      "get",
+      69
+    ],
+    [
+      "cash",
+      61
+    ],
+    [
+      "new",
+      58
+    ],
+    [
+      "send",
+      57
+    ],
+    [
+      "won",
+      54
+    ],
+    [
+      "nokia",
+      52
+    ],
+    [
+      "urgent",
+      51
+    ],
+    [
+      "msg",
+      50
+    ],
+    [
+      "box",
+      48
+    ]
+  ],
+  "top_20_bigrams_ham": [
+    [
+      "let know",
+      40
+    ],
+    [
+      "pick up",
+      37
+    ],
+    [
+      "take care",
+      36
+    ],
+    [
+      "good morning",
+      24
+    ],
+    [
+      "new year",
+      21
+    ],
+    [
+      "last night",
+      19
+    ],
+    [
+      "hi hi",
+      18
+    ],
+    [
+      "wat time",
+      18
+    ],
+    [
+      "wake up",
+      18
+    ],
+    [
+      "ok lor",
+      18
+    ],
+    [
+      "good night",
+      17
+    ],
+    [
+      "happy new",
+      17
+    ],
+    [
+      "great day",
+      16
+    ],
+    [
+      "dont know",
+      16
+    ],
+    [
+      "want go",
+      15
+    ],
+    [
+      "want come",
+      15
+    ],
+    [
+      "call later",
+      13
+    ],
+    [
+      "am going",
+      13
+    ],
+    [
+      "go out",
+      13
+    ],
+    [
+      "good afternoon",
+      13
+    ]
+  ],
+  "top_20_bigrams_spam": [
+    [
+      "your mobile",
+      43
+    ],
+    [
+      "please call",
+      31
+    ],
+    [
+      "po box",
+      23
+    ],
+    [
+      "find out",
+      22
+    ],
+    [
+      "call landline",
+      18
+    ],
+    [
+      "send stop",
+      18
+    ],
+    [
+      "guaranteed call",
+      17
+    ],
+    [
+      "prize guaranteed",
+      16
+    ],
+    [
+      "urgent your",
+      16
+    ],
+    [
+      "txt stop",
+      16
+    ],
+    [
+      "call claim",
+      15
+    ],
+    [
+      "await collection",
+      15
+    ],
+    [
+      "claim call",
+      14
+    ],
+    [
+      "won prize",
+      14
+    ],
+    [
+      "valid hrs",
+      14
+    ],
+    [
+      "selected receive",
+      14
+    ],
+    [
+      "nd attempt",
+      14
+    ],
+    [
+      "free entry",
+      13
+    ],
+    [
+      "reply call",
+      13
+    ],
+    [
+      "ur cash",
+      13
+    ]
+  ]
+}
