@@ -63,11 +63,12 @@ SUSPICIOUS_WORDS = (
 
 # Бренды, которые чаще всего подделывают (>= 22).
 BRAND_DOMAINS = (
-    'kaspi.kz', 'halykbank.kz', 'jusan.kz', 'bcc.kz', 'forte.kz', 'egov.kz',
-    'kazpost.kz', 'sberbank.ru', 'tinkoff.ru', 'vtb.ru', 'alfabank.ru',
-    'gosuslugi.ru', 'paypal.com', 'apple.com', 'google.com', 'microsoft.com',
-    'amazon.com', 'netflix.com', 'binance.com', 'telegram.org',
-    'whatsapp.com', 'instagram.com',
+    'kaspi.kz', 'kaspibank.kz', 'halykbank.kz', 'halyk.kz', 'jusan.kz',
+    'bcc.kz', 'forte.kz', 'egov.kz', 'kazpost.kz', 'sberbank.ru', 'sber.ru',
+    'tinkoff.ru', 'tbank.ru', 'vtb.ru', 'alfabank.ru', 'gosuslugi.ru',
+    'paypal.com', 'apple.com', 'google.com', 'microsoft.com', 'amazon.com',
+    'netflix.com', 'binance.com', 'telegram.org', 'whatsapp.com',
+    'instagram.com',
 )
 
 # Имена брендов без TLD (+ распространённый алиас).
@@ -341,6 +342,12 @@ def _features_from_valid_url(raw: str, normalized: str) -> Dict[str, float]:
 
     domain_length = len(hostname)
     digits_in_domain = sum(1 for char in hostname if char.isdigit())
+    is_legit_brand = registered_domain in BRAND_DOMAINS and '@' not in normalized
+    legit_brand_exempt = (
+        {registered_domain.split('.')[0], 'bank', 'card', 'pay', 'kaspi', 'halyk', 'egov', 'bonus', 'wallet'}
+        if is_legit_brand
+        else set()
+    )
 
     values: Dict[str, float] = {
         'url_length': len(raw) or len(normalized),
@@ -367,7 +374,9 @@ def _features_from_valid_url(raw: str, normalized: str) -> Dict[str, float]:
             or registered_domain in SHORTENERS
         ) else 0,
         'num_suspicious_words': sum(
-            1 for word in SUSPICIOUS_WORDS if word in lowered
+            1 for word in SUSPICIOUS_WORDS
+            if word in lowered
+            and not (is_legit_brand and (word in legit_brand_exempt or word in registered_domain))
         ),
         'has_punycode': 1 if 'xn--' in hostname or 'xn--' in lowered else 0,
         'has_mixed_scripts': (

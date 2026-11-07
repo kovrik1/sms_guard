@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "algorithm": "HistGradientBoosting",
   "best_params": {
-    "learning_rate": 0.05,
-    "max_depth": 10,
+    "learning_rate": 0.1,
+    "max_depth": 8,
     "max_iter": 250
   },
   "all_best_params": {
@@ -13,11 +13,11 @@
     },
     "RandomForest": {
       "max_depth": 20,
-      "n_estimators": 250
+      "n_estimators": 150
     },
     "HistGradientBoosting": {
-      "learning_rate": 0.05,
-      "max_depth": 10,
+      "learning_rate": 0.1,
+      "max_depth": 8,
       "max_iter": 250
     }
   },
@@ -46,341 +46,387 @@
     "num_query_params"
   ],
   "num_features": 22,
-  "threshold": 0.51,
+  "threshold": 0.5,
   "t1": 0.35,
-  "t2": 0.51,
+  "t2": 0.5,
   "thresholds": {
     "t1": 0.35,
-    "t2": 0.51,
+    "t2": 0.5,
     "safe_max": 0.35,
-    "dangerous_min": 0.51
+    "dangerous_min": 0.5
   },
   "threshold_rationale": {
     "t1": 0.35,
-    "t2": 0.51,
-    "t1_val_recall": 0.957,
-    "t1_val_precision": 0.9268,
-    "t2_val_recall": 0.9497,
-    "t2_val_precision": 0.9368,
-    "t2_val_f1": 0.9432,
-    "t2_val_f2": 0.9471,
-    "description": "SAFE: P < 0.35 (низкий риск); SUSPICIOUS: 0.35 <= P < 0.51 (требует осторожности); DANGEROUS: P >= 0.51 (высокая точность обнаружения фишинга)."
+    "t2": 0.5,
+    "t1_val_recall": 0.914,
+    "t1_val_precision": 0.877,
+    "t2_val_recall": 0.8874,
+    "t2_val_precision": 0.9122,
+    "t2_val_f1": 0.8996,
+    "t2_val_f2": 0.8923,
+    "description": "SAFE: P < 0.35 (низкий риск); SUSPICIOUS: 0.35 <= P < 0.5 (требует осторожности); DANGEROUS: P >= 0.5 (высокая точность обнаружения фишинга)."
   },
   "validation_comparison": {
     "LogisticRegression": {
       "threshold": 0.5,
-      "accuracy": 0.8349,
-      "precision": 0.8097,
-      "recall": 0.8147,
-      "f1": 0.8122,
-      "f2": 0.8137,
-      "roc_auc": 0.8886,
-      "pr_auc": 0.8895,
-      "train_time_sec": 2.747,
-      "latency_ms_per_url": 1.4004,
+      "accuracy": 0.8542,
+      "precision": 0.8343,
+      "recall": 0.8033,
+      "f1": 0.8185,
+      "f2": 0.8093,
+      "roc_auc": 0.9206,
+      "pr_auc": 0.9187,
+      "train_time_sec": 3.13,
+      "latency_ms_per_url": 1.3754,
       "confusion_matrix": {
-        "tn": 3887,
-        "fp": 682,
-        "fn": 660,
-        "tp": 2901
+        "tn": 4103,
+        "fp": 510,
+        "fn": 629,
+        "tp": 2568
       }
     },
     "RandomForest": {
       "threshold": 0.5,
-      "accuracy": 0.9419,
-      "precision": 0.932,
-      "recall": 0.9357,
-      "f1": 0.9339,
-      "f2": 0.935,
-      "roc_auc": 0.9749,
-      "pr_auc": 0.9725,
-      "train_time_sec": 7.614,
-      "latency_ms_per_url": 106.0401,
+      "accuracy": 0.9082,
+      "precision": 0.9175,
+      "recall": 0.8524,
+      "f1": 0.8837,
+      "f2": 0.8646,
+      "roc_auc": 0.963,
+      "pr_auc": 0.9576,
+      "train_time_sec": 9.2,
+      "latency_ms_per_url": 61.3941,
       "confusion_matrix": {
-        "tn": 4326,
-        "fp": 243,
-        "fn": 229,
-        "tp": 3332
+        "tn": 4368,
+        "fp": 245,
+        "fn": 472,
+        "tp": 2725
       }
     },
     "HistGradientBoosting": {
       "threshold": 0.5,
-      "accuracy": 0.9497,
-      "precision": 0.9361,
-      "recall": 0.95,
-      "f1": 0.943,
-      "f2": 0.9472,
-      "roc_auc": 0.9807,
-      "pr_auc": 0.9797,
-      "train_time_sec": 10.727,
-      "latency_ms_per_url": 23.964,
+      "accuracy": 0.919,
+      "precision": 0.9122,
+      "recall": 0.8874,
+      "f1": 0.8996,
+      "f2": 0.8923,
+      "roc_auc": 0.9705,
+      "pr_auc": 0.9656,
+      "train_time_sec": 6.256,
+      "latency_ms_per_url": 2.5061,
       "confusion_matrix": {
-        "tn": 4338,
-        "fp": 231,
-        "fn": 178,
-        "tp": 3383
+        "tn": 4340,
+        "fp": 273,
+        "fn": 360,
+        "tp": 2837
       }
     }
   },
   "val_metrics": {
-    "threshold": 0.51,
-    "accuracy": 0.9499,
-    "precision": 0.9368,
-    "recall": 0.9497,
-    "f1": 0.9432,
-    "f2": 0.9471,
-    "roc_auc": 0.9807,
-    "pr_auc": 0.9797,
-    "train_time_sec": 10.727,
-    "latency_ms_per_url": 23.964,
+    "threshold": 0.5,
+    "accuracy": 0.919,
+    "precision": 0.9122,
+    "recall": 0.8874,
+    "f1": 0.8996,
+    "f2": 0.8923,
+    "roc_auc": 0.9705,
+    "pr_auc": 0.9656,
+    "train_time_sec": 6.256,
+    "latency_ms_per_url": 2.5061,
     "confusion_matrix": {
-      "tn": 4341,
-      "fp": 228,
-      "fn": 179,
-      "tp": 3382
+      "tn": 4340,
+      "fp": 273,
+      "fn": 360,
+      "tp": 2837
     }
   },
   "test_metrics": {
-    "threshold": 0.51,
-    "accuracy": 0.9466,
-    "precision": 0.9479,
-    "recall": 0.9363,
-    "f1": 0.9421,
-    "f2": 0.9386,
-    "roc_auc": 0.9788,
-    "pr_auc": 0.9804,
-    "train_time_sec": 10.727,
-    "latency_ms_per_url": 23.964,
+    "threshold": 0.5,
+    "accuracy": 0.9148,
+    "precision": 0.9224,
+    "recall": 0.8895,
+    "f1": 0.9057,
+    "f2": 0.8959,
+    "roc_auc": 0.9693,
+    "pr_auc": 0.9703,
+    "train_time_sec": 6.256,
+    "latency_ms_per_url": 2.5061,
     "confusion_matrix": {
-      "tn": 4491,
-      "fp": 209,
-      "fn": 259,
-      "tp": 3805
+      "tn": 4385,
+      "fp": 298,
+      "fn": 440,
+      "tp": 3542
+    }
+  },
+  "test_metrics_non_synthetic": {
+    "threshold": 0.5,
+    "accuracy": 0.9125,
+    "precision": 0.9199,
+    "recall": 0.8854,
+    "f1": 0.9023,
+    "f2": 0.8921,
+    "roc_auc": 0.9679,
+    "pr_auc": 0.9685,
+    "train_time_sec": 6.256,
+    "latency_ms_per_url": 2.5061,
+    "confusion_matrix": {
+      "tn": 4277,
+      "fp": 296,
+      "fn": 440,
+      "tp": 3399
     }
   },
   "feature_importance": {
     "random_forest_top10": [
       {
-        "feature": "path_length",
-        "importance": 0.23079
-      },
-      {
-        "feature": "is_https",
-        "importance": 0.1462
-      },
-      {
-        "feature": "num_digits_url",
-        "importance": 0.12187
-      },
-      {
-        "feature": "url_length",
-        "importance": 0.08643
+        "feature": "num_suspicious_words",
+        "importance": 0.19184
       },
       {
         "feature": "digit_ratio_domain",
-        "importance": 0.07857
+        "importance": 0.12795
       },
       {
-        "feature": "domain_length",
-        "importance": 0.07713
+        "feature": "is_https",
+        "importance": 0.1277
       },
       {
         "feature": "domain_entropy",
-        "importance": 0.06054
+        "importance": 0.0917
+      },
+      {
+        "feature": "path_length",
+        "importance": 0.08844
+      },
+      {
+        "feature": "domain_length",
+        "importance": 0.07671
+      },
+      {
+        "feature": "url_length",
+        "importance": 0.06101
       },
       {
         "feature": "num_subdomains",
-        "importance": 0.05827
+        "importance": 0.0457
       },
       {
         "feature": "num_dots",
-        "importance": 0.04112
+        "importance": 0.0417
       },
       {
-        "feature": "num_hyphens_domain",
-        "importance": 0.0319
+        "feature": "num_digits_url",
+        "importance": 0.03931
       }
     ],
     "logistic_regression_top10": [
       {
         "feature": "url_length",
-        "abs_coef": 11.49457,
-        "signed_coef": 11.49457
-      },
-      {
-        "feature": "num_digits_url",
-        "abs_coef": 7.11393,
-        "signed_coef": 7.11393
+        "abs_coef": 21.90297,
+        "signed_coef": 21.90297
       },
       {
         "feature": "path_length",
-        "abs_coef": 4.72562,
-        "signed_coef": -4.72562
+        "abs_coef": 10.36363,
+        "signed_coef": -10.36363
       },
       {
         "feature": "num_query_params",
-        "abs_coef": 2.78754,
-        "signed_coef": -2.78754
+        "abs_coef": 7.01736,
+        "signed_coef": -7.01736
       },
       {
         "feature": "domain_length",
-        "abs_coef": 2.31262,
-        "signed_coef": -2.31262
+        "abs_coef": 5.35791,
+        "signed_coef": -5.35791
       },
       {
-        "feature": "has_at_symbol",
-        "abs_coef": 1.61674,
-        "signed_coef": 1.61674
+        "feature": "num_special_chars",
+        "abs_coef": 3.68389,
+        "signed_coef": 3.68389
       },
       {
         "feature": "is_shortener",
-        "abs_coef": 1.55231,
-        "signed_coef": 1.55231
+        "abs_coef": 2.85379,
+        "signed_coef": 2.85379
       },
       {
-        "feature": "is_suspicious_tld",
-        "abs_coef": 1.29227,
-        "signed_coef": 1.29227
+        "feature": "has_at_symbol",
+        "abs_coef": 2.37554,
+        "signed_coef": 2.37554
       },
       {
-        "feature": "has_ip_address",
-        "abs_coef": 1.27469,
-        "signed_coef": 1.27469
+        "feature": "has_double_slash_in_path",
+        "abs_coef": 1.9322,
+        "signed_coef": 1.9322
       },
       {
-        "feature": "is_https",
-        "abs_coef": 1.14463,
-        "signed_coef": -1.14463
+        "feature": "digit_ratio_domain",
+        "abs_coef": 1.72351,
+        "signed_coef": 1.72351
+      },
+      {
+        "feature": "num_suspicious_words",
+        "abs_coef": 1.70128,
+        "signed_coef": 1.70128
       }
     ]
   },
   "synthetic_20_evaluation": {
-    "total": 20,
-    "matched": 20,
+    "total": 27,
+    "matched": 27,
     "results": [
       {
-        "url": "https://www.example.com/about",
+        "url": "https://github.com/python/cpython",
         "expected_category": "SAFE",
-        "p_url": 0.0128,
+        "p_url": 0.2923,
+        "predicted_category": "SAFE",
+        "match": true
+      },
+      {
+        "url": "https://docs.python.org/3/",
+        "expected_category": "SAFE",
+        "p_url": 0.0124,
+        "predicted_category": "SAFE",
+        "match": true
+      },
+      {
+        "url": "https://mail.google.com/mail/u/0/",
+        "expected_category": "SAFE",
+        "p_url": 0.0377,
+        "predicted_category": "SAFE",
+        "match": true
+      },
+      {
+        "url": "https://www.sberbank.ru/ru/person",
+        "expected_category": "SAFE",
+        "p_url": 0.084,
         "predicted_category": "SAFE",
         "match": true
       },
       {
         "url": "https://kaspi.kz",
         "expected_category": "SAFE",
-        "p_url": 0.0214,
+        "p_url": 0.0094,
         "predicted_category": "SAFE",
         "match": true
       },
       {
         "url": "https://egov.kz",
         "expected_category": "SAFE",
-        "p_url": 0.0214,
+        "p_url": 0.0124,
+        "predicted_category": "SAFE",
+        "match": true
+      },
+      {
+        "url": "https://ru.wikipedia.org/wiki/Python",
+        "expected_category": "SAFE",
+        "p_url": 0.0713,
+        "predicted_category": "SAFE",
+        "match": true
+      },
+      {
+        "url": "https://habr.com/ru/articles/123456/",
+        "expected_category": "SAFE",
+        "p_url": 0.03,
+        "predicted_category": "SAFE",
+        "match": true
+      },
+      {
+        "url": "https://www.google.com/search?q=weather",
+        "expected_category": "SAFE",
+        "p_url": 0.0057,
+        "predicted_category": "SAFE",
+        "match": true
+      },
+      {
+        "url": "https://www.example.com/about",
+        "expected_category": "SAFE",
+        "p_url": 0.0715,
         "predicted_category": "SAFE",
         "match": true
       },
       {
         "url": "https://halykbank.kz/ru/cards",
         "expected_category": "SAFE",
-        "p_url": 0.0103,
-        "predicted_category": "SAFE",
-        "match": true
-      },
-      {
-        "url": "https://www.google.com/search?q=python",
-        "expected_category": "SAFE",
-        "p_url": 0.0055,
+        "p_url": 0.2349,
         "predicted_category": "SAFE",
         "match": true
       },
       {
         "url": "https://kazpost.kz/ru/tracking",
         "expected_category": "SAFE",
-        "p_url": 0.0384,
-        "predicted_category": "SAFE",
-        "match": true
-      },
-      {
-        "url": "https://jusan.kz/about",
-        "expected_category": "SAFE",
-        "p_url": 0.0525,
-        "predicted_category": "SAFE",
-        "match": true
-      },
-      {
-        "url": "https://forte.kz/credits",
-        "expected_category": "SAFE",
-        "p_url": 0.0177,
-        "predicted_category": "SAFE",
-        "match": true
-      },
-      {
-        "url": "https://bcc.kz/personal",
-        "expected_category": "SAFE",
-        "p_url": 0.211,
-        "predicted_category": "SAFE",
-        "match": true
-      },
-      {
-        "url": "https://www.wikipedia.org/wiki/Main_Page",
-        "expected_category": "SAFE",
-        "p_url": 0.0038,
+        "p_url": 0.1702,
         "predicted_category": "SAFE",
         "match": true
       },
       {
         "url": "http://secure-bank-verify.example/login",
         "expected_category": "DANGEROUS",
-        "p_url": 0.9578,
+        "p_url": 0.9997,
         "predicted_category": "DANGEROUS",
         "match": true
       },
       {
         "url": "http://192.0.2.15/account-update",
         "expected_category": "DANGEROUS",
-        "p_url": 0.9989,
+        "p_url": 0.9996,
         "predicted_category": "DANGEROUS",
         "match": true
       },
       {
         "url": "bit.ly/prize-claim-test",
         "expected_category": "DANGEROUS",
-        "p_url": 1.0,
+        "p_url": 0.9783,
         "predicted_category": "DANGEROUS",
         "match": true
       },
       {
         "url": "http://bank-kz-verify.test",
         "expected_category": "DANGEROUS",
-        "p_url": 0.9975,
+        "p_url": 0.9984,
         "predicted_category": "DANGEROUS",
         "match": true
       },
       {
         "url": "http://post-delivery-pay.example",
         "expected_category": "DANGEROUS",
-        "p_url": 0.9614,
+        "p_url": 0.9193,
         "predicted_category": "DANGEROUS",
         "match": true
       },
       {
         "url": "http://xn--exmplecua.test/secure/login?verify=1",
         "expected_category": "DANGEROUS",
-        "p_url": 0.9994,
+        "p_url": 0.9999,
+        "predicted_category": "DANGEROUS",
+        "match": true
+      },
+      {
+        "url": "https://kaspi-login-secure.xyz/verify",
+        "expected_category": "DANGEROUS",
+        "p_url": 0.9999,
+        "predicted_category": "DANGEROUS",
+        "match": true
+      },
+      {
+        "url": "http://sberbank-login.xyz",
+        "expected_category": "DANGEROUS",
+        "p_url": 0.9999,
         "predicted_category": "DANGEROUS",
         "match": true
       },
       {
         "url": "http://kaspi-bonus-prize.xyz/claim",
         "expected_category": "DANGEROUS",
-        "p_url": 0.9991,
+        "p_url": 1.0,
         "predicted_category": "DANGEROUS",
         "match": true
       },
       {
         "url": "http://halyk-security-update.top/verify/card",
         "expected_category": "DANGEROUS",
-        "p_url": 0.9998,
+        "p_url": 0.9999,
         "predicted_category": "DANGEROUS",
         "match": true
       },
@@ -394,32 +440,184 @@
       {
         "url": "http://egov-payout-bonus.icu/wallet/unlock",
         "expected_category": "DANGEROUS",
+        "p_url": 1.0,
+        "predicted_category": "DANGEROUS",
+        "match": true
+      },
+      {
+        "url": "https://login.verify.account.security.example.com/update",
+        "expected_category": "DANGEROUS",
         "p_url": 0.9998,
+        "predicted_category": "DANGEROUS",
+        "match": true
+      },
+      {
+        "url": "http://example.com:8080/login/verify",
+        "expected_category": "DANGEROUS",
+        "p_url": 0.9984,
+        "predicted_category": "DANGEROUS",
+        "match": true
+      },
+      {
+        "url": "https://bit.ly/3xYz987",
+        "expected_category": "DANGEROUS",
+        "p_url": 0.9997,
         "predicted_category": "DANGEROUS",
         "match": true
       }
     ]
   },
   "dataset_summary": {
-    "total_rows": 61607,
+    "total_rows": 61685,
     "split_counts": {
-      "train": 44713,
-      "val": 8130,
-      "test": 8764
+      "train": 45210,
+      "val": 7810,
+      "test": 8665
+    },
+    "synthetic_breakdown": {
+      "train": {
+        "total": 45210,
+        "non_synthetic": 44011,
+        "synthetic": 1199,
+        "synthetic_share": 0.0265
+      },
+      "val": {
+        "total": 7810,
+        "non_synthetic": 7561,
+        "synthetic": 249,
+        "synthetic_share": 0.0319
+      },
+      "test": {
+        "total": 8665,
+        "non_synthetic": 8412,
+        "synthetic": 253,
+        "synthetic_share": 0.0292
+      }
     },
     "unique_domains": {
-      "train": 31833,
-      "val": 6821,
-      "test": 6822,
+      "train": 31899,
+      "val": 6836,
+      "test": 6836,
       "overlap_train_val": 0,
       "overlap_train_test": 0,
       "overlap_val_test": 0
     },
     "artifact_mitigation": {
-      "www_removed": 13391,
-      "scheme_to_http": 5975,
-      "safe_path_added": 16403
+      "www_removed": 14956,
+      "subdomain_varied": 3706,
+      "scheme_to_http": 4545,
+      "safe_path_added": 20323,
+      "phish_path_added": 11384,
+      "trailing_slash_normalized": 3983
+    },
+    "distributions_before": {
+      "path_length": {
+        "safe_0": {
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "q90": 0.0,
+          "q95": 0.0,
+          "max": 0.0,
+          "nonzero_share": 0.0
+        },
+        "dangerous_1": {
+          "mean": 8.6061,
+          "std": 31.6555,
+          "min": 0.0,
+          "q25": 0.0,
+          "q50": 1.0,
+          "q75": 6.0,
+          "q90": 28.0,
+          "q95": 52.0,
+          "max": 4248.0,
+          "nonzero_share": 0.5961
+        }
+      },
+      "num_digits_url": {
+        "safe_0": {
+          "mean": 0.0524,
+          "std": 0.3525,
+          "min": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "q90": 0.0,
+          "q95": 0.0,
+          "max": 7.0,
+          "nonzero_share": 0.0275
+        },
+        "dangerous_1": {
+          "mean": 4.2391,
+          "std": 15.5348,
+          "min": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 5.0,
+          "q90": 11.0,
+          "q95": 19.0,
+          "max": 1884.0,
+          "nonzero_share": 0.4738
+        }
+      }
+    },
+    "distributions_after": {
+      "path_length": {
+        "safe_0": {
+          "mean": 13.5879,
+          "std": 15.6967,
+          "min": 0.0,
+          "q25": 0.0,
+          "q50": 8.0,
+          "q75": 22.0,
+          "q90": 38.0,
+          "q95": 48.0,
+          "max": 60.0,
+          "nonzero_share": 0.6774
+        },
+        "dangerous_1": {
+          "mean": 14.3945,
+          "std": 19.6239,
+          "min": 0.0,
+          "q25": 0.0,
+          "q50": 10.0,
+          "q75": 21.0,
+          "q90": 28.0,
+          "q95": 52.0,
+          "max": 501.0,
+          "nonzero_share": 0.6755
+        }
+      },
+      "num_digits_url": {
+        "safe_0": {
+          "mean": 3.2251,
+          "std": 5.0991,
+          "min": 0.0,
+          "q25": 0.0,
+          "q50": 1.0,
+          "q75": 6.0,
+          "q90": 9.0,
+          "q95": 12.0,
+          "max": 45.0,
+          "nonzero_share": 0.504
+        },
+        "dangerous_1": {
+          "mean": 5.6704,
+          "std": 11.209,
+          "min": 0.0,
+          "q25": 0.0,
+          "q50": 3.0,
+          "q75": 7.0,
+          "q90": 13.0,
+          "q95": 19.0,
+          "max": 632.0,
+          "nonzero_share": 0.6157
+        }
+      }
     }
   },
-  "trained_at": "2026-11-07T07:25:04.956792+00:00"
+  "trained_at": "2026-11-07T08:04:02.898578+00:00"
 }

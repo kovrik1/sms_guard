@@ -262,6 +262,18 @@ def test_suspicious_words_counted():
     assert extract_url_features('https://example.com/about')['num_suspicious_words'] == 0
 
 
+def test_legit_brand_domain_words_excluded_from_suspicious_words():
+    assert extract_url_features('https://www.sberbank.ru/ru/person')['num_suspicious_words'] == 0
+    assert extract_url_features('https://halykbank.kz/ru/cards')['num_suspicious_words'] == 0
+    assert extract_url_features('https://kaspi.kz/shop')['num_suspicious_words'] == 0
+    assert extract_url_features('https://egov.kz/cms/ru')['num_suspicious_words'] == 0
+    assert extract_url_features('https://paypal.com/us/home')['num_suspicious_words'] == 0
+    # Non-exact / spoofed domain still counts both brand/bank and login
+    spoof = extract_url_features('http://sberbank-login.xyz/verify')
+    assert spoof['num_suspicious_words'] >= 3
+    assert spoof['brand_similarity'] == 1
+
+
 def test_query_params_counted():
     f = extract_url_features('https://example.com/search?a=1&b=2&c=')
     assert f['num_query_params'] == 3

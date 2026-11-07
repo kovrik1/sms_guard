@@ -1,8 +1,8 @@
 """Обучение, сравнение и оценка моделей обнаружения опасных URL (Задание 11).
 
 Скрипт:
-1. Загружает матрицу признаков ``data/processed/url_features.parquet`` (или
-   строит её через :func:`ml.data.load_url.prepare_url_dataset`).
+1. Строит или загружает матрицу признаков ``data/processed/url_features.parquet``
+   через :func:`ml.data.load_url.prepare_url_dataset`.
 2. Строит и сохраняет EDA-графики (``04_url_class_balance.png``,
    ``04_url_features_comparison.png``).
 3. Обучает и сравнивает 3 алгоритма на обучающей выборке с подбором
@@ -12,12 +12,13 @@
    - ``HistGradientBoostingClassifier``.
 4. Строит ROC- и PR-кривые (``05_url_roc_pr_curves.png``) и график топ-10
    важнейших признаков (``05_url_feature_importance.png``).
-5. Подбирает на валидации пороги ``t1`` и ``t2`` для трёх категорий:
+5. Подбирает ТОЛЬКО на валидации пороги ``t1`` и ``t2`` для трёх категорий:
    ``SAFE`` (``P < t1``), ``SUSPICIOUS`` (``t1 <= P < t2``),
    ``DANGEROUS`` (``P >= t2``).
-6. Однократно оценивает лучшую модель на тестовой выборке, переобучает на
-   ``train + val``, проверяет на 20 искусственных URL (10 безопасных и 10
-   опасных) и сохраняет ``ml/artifacts/url_model.joblib`` и
+6. Однократно оценивает лучшую модель (обученную только на ``train``) на
+   тестовой выборке (как на всём ``test``, так и отдельно на не-синтетической
+   части ``is_synthetic == 0``), затем переобучает на ``train + val`` и
+   сохраняет ``ml/artifacts/url_model.joblib`` и
    ``ml/artifacts/url_model_meta.json``.
 """
 
@@ -38,7 +39,6 @@ import numpy as np
 import pandas as pd
 from sklearn.base import clone
 from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
-from sklearn.inspection import permutation_importance
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     accuracy_score,
@@ -70,16 +70,18 @@ MODEL_PATH = ARTIFACTS_DIR / "url_model.joblib"
 META_PATH = ARTIFACTS_DIR / "url_model_meta.json"
 
 SYNTHETIC_SAFE_URLS = [
-    "https://www.example.com/about",
+    "https://github.com/python/cpython",
+    "https://docs.python.org/3/",
+    "https://mail.google.com/mail/u/0/",
+    "https://www.sberbank.ru/ru/person",
     "https://kaspi.kz",
     "https://egov.kz",
+    "https://ru.wikipedia.org/wiki/Python",
+    "https://habr.com/ru/articles/123456/",
+    "https://www.google.com/search?q=weather",
+    "https://www.example.com/about",
     "https://halykbank.kz/ru/cards",
-    "https://www.google.com/search?q=python",
     "https://kazpost.kz/ru/tracking",
-    "https://jusan.kz/about",
-    "https://forte.kz/credits",
-    "https://bcc.kz/personal",
-    "https://www.wikipedia.org/wiki/Main_Page",
 ]
 
 SYNTHETIC_DANGEROUS_URLS = [
@@ -89,10 +91,15 @@ SYNTHETIC_DANGEROUS_URLS = [
     "http://bank-kz-verify.test",
     "http://post-delivery-pay.example",
     "http://xn--exmplecua.test/secure/login?verify=1",
+    "https://kaspi-login-secure.xyz/verify",
+    "http://sberbank-login.xyz",
     "http://kaspi-bonus-prize.xyz/claim",
     "http://halyk-security-update.top/verify/card",
     "http://user@evil-login-pay.click:8080//confirm",
     "http://egov-payout-bonus.icu/wallet/unlock",
+    "https://login.verify.account.security.example.com/update",
+    "http://example.com:8080/login/verify",
+    "https://bit.ly/3xYz987",
 ]
 
 
@@ -124,7 +131,6 @@ def _plot_eda_figures(df: pd.DataFrame, figures_dir: Path) -> None:
     """Построить графики EDA для Задания 10."""
     figures_dir.mkdir(parents=True, exist_ok=True)
 
-    # 1. Баланс классов по выборкам
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.8))
 
     counts = df["label"].value_counts().sort_index()
@@ -167,9 +173,8 @@ def _plot_eda_figures(df: pd.DataFrame, figures_dir: Path) -> None:
     plt.savefig(figures_dir / "04_url_class_balance.png", dpi=150)
     plt.close(fig)
 
-    # 2. Сравнение 6 ключевых признаков по классам
     key_features = [
-        ("url_length", "Длина URL (url_length)"),
+        ("path_length", "Длина пути (path_length)"),
         ("domain_length", "Длина домена (domain_length)"),
         ("num_suspicious_words", "Подозрительные слова (num_suspicious_words)"),
         ("domain_entropy", "Энтропия домена (domain_entropy)"),
@@ -205,9 +210,9 @@ def _plot_eda_figures(df: pd.DataFrame, figures_dir: Path) -> None:
             ax.set_ylim(0, max(means) * 1.25 + 0.05)
             ax.set_ylabel("Среднее значение")
         else:
-            q99 = float(np.percentile(df[col], 98))
-            data_0 = np.clip(safe_df[col].to_numpy(), 0, q99)
-            data_1 = np.clip(phish_df[col].to_numpy(), 0, q99)
+            q98 = float(np.percentile(df[col], 98))
+            data_0 = np.clip(safe_df[col].to_numpy(), 0, q98)
+            data_1 = np.clip(phish_df[col].to_numpy(), 0, q98)
             bp = ax.boxplot(
                 [data_0, data_1],
                 tick_labels=["SAFE (0)", "DANGEROUS (1)"],
@@ -219,7 +224,7 @@ def _plot_eda_figures(df: pd.DataFrame, figures_dir: Path) -> None:
             ax.set_ylabel("Значение признака")
         ax.set_title(title, fontsize=10)
 
-    fig.suptitle("Сравнение 6 ключевых признаков URL по классам", fontsize=13)
+    fig.suptitle("Сравнение 6 ключевых признаков URL по классам (после де-артефактизации)", fontsize=13)
     plt.tight_layout()
     plt.savefig(figures_dir / "04_url_features_comparison.png", dpi=150)
     plt.close(fig)
@@ -235,7 +240,6 @@ def _plot_model_curves_and_importance(
     """Построить ROC/PR кривые и график важности признаков."""
     figures_dir.mkdir(parents=True, exist_ok=True)
 
-    # 1. ROC и PR кривые всех моделей
     fig, axes = plt.subplots(1, 2, figsize=(13, 5.2))
     colors = {
         "LogisticRegression": "#1d3557",
@@ -281,7 +285,6 @@ def _plot_model_curves_and_importance(
     plt.savefig(figures_dir / "05_url_roc_pr_curves.png", dpi=150)
     plt.close(fig)
 
-    # 2. Важность признаков (Random Forest + Logistic Regression)
     rf_imp = rf_model.feature_importances_
     rf_order = np.argsort(rf_imp)[::-1][:10]
 
@@ -324,27 +327,20 @@ def _plot_model_curves_and_importance(
 
 
 def _select_thresholds(y_val: np.ndarray, val_probs: np.ndarray) -> tuple[float, float, dict[str, Any]]:
-    """Подобрать пороги t1 (SAFE -> SUSPICIOUS) и t2 (SUSPICIOUS -> DANGEROUS) на валидации.
-
-    Критерий для t2: минимальный порог из диапазона [0.50, 0.75], при котором
-    Precision >= 0.88 и максимизируется F2-мера (приоритет полноты при высокой точности).
-    Порог t1 задаёт нижнюю границу зоны внимания SUSPICIOUS (Precision >= 0.75,
-    высокий Recall >= 0.94).
-    """
-    best_t2 = 0.60
+    """Подобрать пороги t1 (SAFE -> SUSPICIOUS) и t2 (SUSPICIOUS -> DANGEROUS) ТОЛЬКО на валидации."""
+    best_t2 = 0.55
     best_f2 = -1.0
     for cand in np.linspace(0.50, 0.72, 45):
         preds = (val_probs >= cand).astype(int)
         prec = precision_score(y_val, preds, zero_division=0)
-        rec = recall_score(y_val, preds, zero_division=0)
         f2 = fbeta_score(y_val, preds, beta=2, zero_division=0)
-        if prec >= 0.88 and f2 > best_f2:
+        if prec >= 0.90 and f2 > best_f2:
             best_f2 = float(f2)
             best_t2 = round(float(cand), 2)
 
     t1 = 0.35
     if best_t2 <= t1 + 0.10:
-        best_t2 = 0.60
+        best_t2 = 0.55
 
     preds_t1 = (val_probs >= t1).astype(int)
     preds_t2 = (val_probs >= best_t2).astype(int)
@@ -375,8 +371,8 @@ def _categorize_prob(prob: float, t1: float, t2: float) -> str:
     return "DANGEROUS"
 
 
-def _evaluate_synthetic_20(model: Any, t1: float, t2: float) -> list[dict[str, Any]]:
-    """Проверить модель на 20 искусственных URL (10 безопасных + 10 опасных)."""
+def _evaluate_synthetic_urls(model: Any, t1: float, t2: float) -> list[dict[str, Any]]:
+    """Проверить модель на контрольном наборе реальных безопасных и фишинговых URL."""
     records: list[dict[str, Any]] = []
     all_items = [(u, "SAFE") for u in SYNTHETIC_SAFE_URLS] + [
         (u, "DANGEROUS") for u in SYNTHETIC_DANGEROUS_URLS
@@ -399,9 +395,9 @@ def _evaluate_synthetic_20(model: Any, t1: float, t2: float) -> list[dict[str, A
     return records
 
 
-def train_and_evaluate_url_models() -> dict[str, Any]:
-    """Полный цикл обучения, выбора порога, оценки на тесте и сохранения артефактов."""
-    if not DEFAULT_PARQUET_PATH.exists() or not DEFAULT_SPLIT_PATH.exists():
+def train_and_evaluate_url_models(force_reload: bool = True) -> dict[str, Any]:
+    """Полный цикл обучения, выбора порога на val, оценки на test и сохранения артефактов."""
+    if force_reload or not DEFAULT_PARQUET_PATH.exists() or not DEFAULT_SPLIT_PATH.exists():
         df, split_info = prepare_url_dataset()
     else:
         df = pd.read_parquet(DEFAULT_PARQUET_PATH)
@@ -413,6 +409,7 @@ def train_and_evaluate_url_models() -> dict[str, Any]:
     df_train = df[df["split"] == "train"]
     df_val = df[df["split"] == "val"]
     df_test = df[df["split"] == "test"]
+    df_test_non_synth = df_test[df_test["is_synthetic"] == 0]
 
     X_train = df_train[URL_FEATURE_NAMES]
     y_train = df_train["label"].to_numpy()
@@ -420,6 +417,8 @@ def train_and_evaluate_url_models() -> dict[str, Any]:
     y_val = df_val["label"].to_numpy()
     X_test = df_test[URL_FEATURE_NAMES]
     y_test = df_test["label"].to_numpy()
+    X_test_ns = df_test_non_synth[URL_FEATURE_NAMES]
+    y_test_ns = df_test_non_synth["label"].to_numpy()
 
     cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
 
@@ -444,7 +443,7 @@ def train_and_evaluate_url_models() -> dict[str, Any]:
         ),
         "HistGradientBoosting": (
             HistGradientBoostingClassifier(random_state=42),
-            {"max_iter": [150, 250], "max_depth": [6, 10], "learning_rate": [0.05, 0.1]},
+            {"max_iter": [150, 250], "max_depth": [6, 8], "learning_rate": [0.05, 0.1]},
         ),
     }
 
@@ -469,7 +468,6 @@ def train_and_evaluate_url_models() -> dict[str, Any]:
         trained_models[name] = best_model
         best_params_map[name] = search.best_params_
 
-        # Измерение времени предсказания одного URL (мс)
         sample_one = X_val.iloc[:1]
         t_lat = time.perf_counter()
         for _ in range(50):
@@ -490,7 +488,6 @@ def train_and_evaluate_url_models() -> dict[str, Any]:
         figures_dir=FIGURES_DIR,
     )
 
-    # Выбираем лучшую модель по F2 и ROC-AUC на валидации (и проверяем корректность на демо-URL)
     selected_name = max(
         comparison_table.keys(),
         key=lambda k: (comparison_table[k]["f2"], comparison_table[k]["roc_auc"]),
@@ -498,9 +495,11 @@ def train_and_evaluate_url_models() -> dict[str, Any]:
     selected_val_probs = val_probs_map[selected_name]
     t1, t2, threshold_rationale = _select_thresholds(y_val, selected_val_probs)
 
-    # Однократная оценка выбранной модели на тестовой выборке (до переобучения на train+val)
+    # Однократная оценка train-only модели на test (все строки + отдельно не-синтетические)
     selected_model_train_only = trained_models[selected_name]
     test_probs = selected_model_train_only.predict_proba(X_test)[:, 1]
+    test_probs_ns = selected_model_train_only.predict_proba(X_test_ns)[:, 1]
+
     val_metrics_at_t2 = _compute_metrics(
         y_val,
         selected_val_probs,
@@ -515,6 +514,13 @@ def train_and_evaluate_url_models() -> dict[str, Any]:
         train_time_sec=comparison_table[selected_name]["train_time_sec"],
         latency_ms=comparison_table[selected_name]["latency_ms_per_url"],
     )
+    test_metrics_non_synth_at_t2 = _compute_metrics(
+        y_test_ns,
+        test_probs_ns,
+        threshold=t2,
+        train_time_sec=comparison_table[selected_name]["train_time_sec"],
+        latency_ms=comparison_table[selected_name]["latency_ms_per_url"],
+    )
 
     # Переобучение итоговой модели на объединённой выборке train + val
     X_train_val = pd.concat([X_train, X_val], ignore_index=True)
@@ -522,8 +528,7 @@ def train_and_evaluate_url_models() -> dict[str, Any]:
     final_model = clone(selected_model_train_only)
     final_model.fit(X_train_val, y_train_val)
 
-    # Проверка на 20 синтетических URL
-    synth_results = _evaluate_synthetic_20(final_model, t1, t2)
+    synth_results = _evaluate_synthetic_urls(final_model, t1, t2)
 
     ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
     joblib.dump(final_model, MODEL_PATH)
@@ -544,6 +549,7 @@ def train_and_evaluate_url_models() -> dict[str, Any]:
         "validation_comparison": comparison_table,
         "val_metrics": val_metrics_at_t2,
         "test_metrics": test_metrics_at_t2,
+        "test_metrics_non_synthetic": test_metrics_non_synth_at_t2,
         "feature_importance": importance_info,
         "synthetic_20_evaluation": {
             "total": len(synth_results),
@@ -553,8 +559,11 @@ def train_and_evaluate_url_models() -> dict[str, Any]:
         "dataset_summary": {
             "total_rows": split_info["final_rows"],
             "split_counts": split_info["split_counts"],
+            "synthetic_breakdown": split_info["synthetic_breakdown"],
             "unique_domains": split_info["unique_domains"],
             "artifact_mitigation": split_info["artifact_mitigation"],
+            "distributions_before": split_info["distributions_before"],
+            "distributions_after": split_info["distributions_after"],
         },
         "trained_at": datetime.now(timezone.utc).isoformat(),
     }
@@ -566,14 +575,15 @@ def train_and_evaluate_url_models() -> dict[str, Any]:
 
 
 if __name__ == "__main__":
-    result_meta = train_and_evaluate_url_models()
+    result_meta = train_and_evaluate_url_models(force_reload=True)
     print(f"Selected model: {result_meta['algorithm']}")
     print(f"Thresholds: t1={result_meta['t1']}, t2={result_meta['t2']}")
     print(f"Val metrics (at t2): {result_meta['val_metrics']}")
-    print(f"Test metrics (at t2): {result_meta['test_metrics']}")
+    print(f"Test metrics ALL (at t2): {result_meta['test_metrics']}")
+    print(f"Test metrics NON-SYNTHETIC (at t2): {result_meta['test_metrics_non_synthetic']}")
     matched = result_meta["synthetic_20_evaluation"]["matched"]
     total = result_meta["synthetic_20_evaluation"]["total"]
-    print(f"Synthetic 20 URLs matched: {matched}/{total}")
+    print(f"Control URLs matched: {matched}/{total}")
     for item in result_meta["synthetic_20_evaluation"]["results"]:
         if not item["match"]:
             print("  MISMATCH:", item)
