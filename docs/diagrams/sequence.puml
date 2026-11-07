@@ -1,0 +1,77 @@
+@startuml sequence
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+autonumber
+
+title Диаграмма последовательности: Проверка SMS-сообщения со ссылкой
+
+actor "Пользователь" as User
+participant "Веб-интерфейс\n(Browser / UI)" as UI
+participant "Контроллер Django / DRF\n(apps.analysis.views)" as View
+participant "Сервис анализа\n(AnalysisService)" as Service
+participant "Предобработка и правила\n(ml.preprocessing, ml.rules)" as Prep
+participant "SMS ML-модель\n(ml.predictor)" as SMSModel
+participant "URL-анализатор и ML-модель\n(ml.url_features, ml.predictor)" as URLModel
+participant "Модуль оценки риска\n(ml.risk)" as Risk
+database "База данных\n(PostgreSQL / SQLite)" as DB
+
+User -> UI : Вводит текст SMS и нажимает «Проверить»
+UI -> View : POST /api/v1/check/sms/ (CSRF-токен, {"text": "..."})
+activate View
+
+View -> View : Проверка сессии, лимита запросов (<=30/мин)\nи длины текста (1..1000 символов)
+
+View -> Service : analyze_sms(user, text)
+activate Service
+
+Service -> Prep : detect_language(text), extract_urls(text, max=3)
+activate Prep
+Prep --> Service : language="ru", urls=["http://kaspi-verify.xyz/login"]
+deactivate Prep
+
+Service -> Prep : normalize_sms(text)
+activate Prep
+Prep --> Service : text_clean ("ваш счет заблокирован перейдите <url>")
+deactivate Prep
+
+Service -> SMSModel : predict_sms(text_clean)
+activate SMSModel
+SMSModel --> Service : p_sms = 0.91, sms_model_version = "1.0.0"
+deactivate SMSModel
+
+Service -> Prep : match_rules(text)
+activate Prep
+Prep --> Service : matched_features = [URGENCY, ACCOUNT_BLOCK, BANK_CARD]
+deactivate Prep
+
+loop Для каждого URL (до 3 ссылок)
+    Service -> URLModel : extract_url_features(url) & predict_url(features)
+    activate URLModel
+    URLModel --> Service : p_url = 0.88, category = "DANGEROUS", domain = "kaspi-verify.xyz"
+    deactivate URLModel
+end
+
+Service -> Risk : calculate_risk(p_sms, url_results, matched_features, language)
+activate Risk
+Risk --> Service : risk_score = 89, risk_level = "HIGH", category = "FRAUDULENT",\nexplanation, recommendation, disclaimer
+deactivate Risk
+
+Service -> DB : Чтение user_profile.store_sms_text
+activate DB
+DB --> Service : store_sms_text = False
+deactivate DB
+
+Service -> DB : INSERT INTO checks, url_results, detected_features\n(input_text=NULL, input_masked="...")
+activate DB
+DB --> Service : check_id = 128
+deactivate DB
+
+Service --> View : Объект результата проверки (id=128, score=89, category="FRAUDULENT")
+deactivate Service
+
+View --> UI : HTTP 200 OK (JSON / HTML с экранированием и неактивными ссылками)
+deactivate View
+
+UI --> User : Отображает уровень риска, причины, раскладку по URL и рекомендацию
+
+@enduml

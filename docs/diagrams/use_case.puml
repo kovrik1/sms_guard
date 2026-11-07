@@ -1,0 +1,54 @@
+@startuml use_case
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+
+actor "Пользователь" as User
+actor "Администратор" as Admin
+
+Admin --|> User
+
+rectangle "Интеллектуальная система SMS Guard" {
+    package "Аутентификация и профиль (Модуль 2.1)" {
+        usecase "UC-01: Регистрация в системе" as UC1
+        usecase "UC-02: Авторизация и выход из системы" as UC2
+        usecase "UC-03: Настройка профиля\n(согласие на хранение текста SMS, язык)" as UC3
+    }
+
+    package "Интеллектуальный анализ и оценка риска (Модули 2.2–2.5)" {
+        usecase "UC-04: Проверка SMS-сообщения" as UC4
+        usecase "UC-05: Проверка интернет-ссылки (URL)" as UC5
+        usecase "UC-06: Автоматическое извлечение и проверка\nURL из текста SMS (до 3 ссылок)" as UC6
+        usecase "UC-07: Расчёт Risk Score, объяснение причин\nи формирование рекомендаций" as UC7
+    }
+
+    package "История и аналитика (Модули 2.6–2.7)" {
+        usecase "UC-08: Просмотр и фильтрация\nсобственной истории проверок" as UC8
+        usecase "UC-09: Удаление записи из истории" as UC9
+        usecase "UC-10: Экспорт истории проверок в CSV" as UC10
+        usecase "UC-11: Просмотр персональной статистики\nна панели мониторинга (Dashboard)" as UC11
+        usecase "UC-12: Просмотр агрегированной статистики\nпо всем пользователям (без текстов чужих SMS)" as UC12
+        usecase "UC-13: Мониторинг активных версий ML-моделей\nи статуса сервиса (/api/v1/health/)" as UC13
+    }
+}
+
+User --> UC1
+User --> UC2
+User --> UC3
+User --> UC4
+User --> UC5
+User --> UC8
+User --> UC9
+User --> UC10
+User --> UC11
+
+UC4 ..> UC6 : <<extend>>\n[если в SMS найден URL]
+UC4 ..> UC7 : <<include>>
+UC5 ..> UC7 : <<include>>
+
+Admin --> UC12
+Admin --> UC13
+
+@enduml

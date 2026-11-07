@@ -1,0 +1,87 @@
+@startuml er_diagram
+hide circle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+
+title ER-диаграмма базы данных системы SMS Guard
+
+entity "users\n(Встроенная модель Django)" as users {
+    * **id** : BIGINT <<PK>>
+    --
+    * username : VARCHAR(30) <<UNIQUE>>
+    * email : VARCHAR(254) <<UNIQUE>>
+    * password : VARCHAR(128)
+    * is_staff : BOOLEAN
+    * is_active : BOOLEAN
+    * date_joined : TIMESTAMPTZ
+}
+
+entity "user_profile\n(Профиль пользователя)" as user_profile {
+    * **id** : BIGINT <<PK>>
+    --
+    * user_id : BIGINT <<FK, UNIQUE>>
+    * store_sms_text : BOOLEAN (default: false)
+    * preferred_language : VARCHAR(10) (default: 'ru')
+    * failed_login_attempts : INTEGER (default: 0)
+    locked_until : TIMESTAMPTZ <<NULL>>
+}
+
+entity "checks\n(История проверок SMS и URL)" as checks {
+    * **id** : BIGINT <<PK>>
+    --
+    * user_id : BIGINT <<FK, INDEX>>
+    * check_type : VARCHAR(10) ('SMS' | 'URL')
+    input_text : TEXT <<NULL>>
+    * input_masked : TEXT
+    * language : VARCHAR(10) ('ru' | 'kk' | 'en' | 'other')
+    * category : VARCHAR(20) ('SAFE' | 'SUSPICIOUS' | 'FRAUDULENT' | 'DANGEROUS') <<INDEX>>
+    * risk_level : VARCHAR(10) ('LOW' | 'MEDIUM' | 'HIGH')
+    * risk_score : SMALLINT (0..100)
+    p_sms : FLOAT <<NULL>>
+    * explanation : JSONB
+    * recommendation : TEXT
+    * sms_model_version : VARCHAR(32)
+    * url_model_version : VARCHAR(32)
+    * created_at : TIMESTAMPTZ <<INDEX>>
+}
+
+entity "url_results\n(Результаты проверки ссылок)" as url_results {
+    * **id** : BIGINT <<PK>>
+    --
+    * check_id : BIGINT <<FK, ON DELETE CASCADE>>
+    * url : VARCHAR(2048)
+    * domain : VARCHAR(255)
+    * p_url : FLOAT (0.0..1.0)
+    * category : VARCHAR(20) ('SAFE' | 'SUSPICIOUS' | 'DANGEROUS')
+    * features_json : JSONB
+}
+
+entity "detected_features\n(Сработавшие признаки СИ)" as detected_features {
+    * **id** : BIGINT <<PK>>
+    --
+    * check_id : BIGINT <<FK, ON DELETE CASCADE>>
+    * code : VARCHAR(50)
+    * title : VARCHAR(255)
+    * weight : FLOAT
+}
+
+entity "model_versions\n(Справочник версий ML-моделей)" as model_versions {
+    * **id** : BIGINT <<PK>>
+    --
+    * model_type : VARCHAR(10) ('sms' | 'url')
+    * version : VARCHAR(32)
+    * algorithm : VARCHAR(100)
+    * metrics_json : JSONB
+    * threshold : FLOAT
+    * trained_at : TIMESTAMPTZ
+    * is_active : BOOLEAN
+}
+
+users ||--|| user_profile : "1 : 1"
+users ||--o{ checks : "1 : N"
+checks ||--o{ url_results : "1 : N (CASCADE)"
+checks ||--o{ detected_features : "1 : N (CASCADE)"
+model_versions ..> checks : "версии моделей\n(справочная связь)"
+
+@enduml
