@@ -1,0 +1,12 @@
+[run]
+source = ml
+omit =
+    ml/train_sms.py
+    ml/train_url.py
+    ml/data/load_url.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:
+    raise NotImplementedError
