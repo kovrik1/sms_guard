@@ -1,0 +1,181 @@
+id,language,text,label,category_hint,author
+CUS-RU-001,ru,Служба безопасности банка: зафиксирована попытка входа в ваш личный кабинет. Срочно подтвердите личность: http://bank-security.example/verify,1,fake_bank,student_manual_annotation
+CUS-RU-002,ru,"Привет! Ты уже дома? Я купила хлеб и молоко, ужин будет через час.",0,household_chat,student_manual_annotation
+CUS-RU-003,ru,Уважаемый клиент! Ваш счёт временно ограничен из-за подозрительной операции. Пройдите проверку по ссылке http://secure-bank-check.example/login,1,fake_bank,student_manual_annotation
+CUS-RU-004,ru,"Не забудь полить цветы, пока меня нет. Ключ оставила у соседки.",0,household_chat,student_manual_annotation
+CUS-RU-005,ru,Банк сообщает: для разблокировки онлайн-банка перейдите на http://online-bank-restore.test и введите логин.,1,fake_bank,student_manual_annotation
+CUS-RU-006,ru,"Доброе утро! Я вышла раньше, завтрак на столе. Хорошего дня!",0,household_chat,student_manual_annotation
+CUS-RU-007,ru,"Обнаружен новый вход с незнакомого устройства. Если это не вы, отмените операцию на http://bank-stop.example/cancel",1,fake_bank,student_manual_annotation
+CUS-RU-008,ru,"Ты не видел мои очки? Кажется, оставила их на кухне.",0,household_chat,student_manual_annotation
+CUS-RU-009,ru,Ваш платёж отклонён службой контроля. Подтвердите реквизиты на http://pay-control.example/confirm,1,fake_bank,student_manual_annotation
+CUS-RU-010,ru,"Сегодня холодно, надень куртку. Вечером обещали дождь.",0,household_chat,student_manual_annotation
+CUS-RU-011,ru,Здравствуйте! Это ваш персональный менеджер банка. Для продления обслуживания подтвердите данные карты по ссылке http://bank-manager.example/form,1,fake_bank,student_manual_annotation
+CUS-RU-012,ru,"Я задержусь на работе на полчаса, начните ужинать без меня.",0,household_chat,student_manual_annotation
+CUS-RU-013,ru,Срочно! Мошенники пытаются снять деньги с вашего счёта. Перезвоните в службу безопасности и назовите код из SMS.,1,fake_bank,student_manual_annotation
+CUS-RU-014,ru,Спасибо за помощь с ремонтом! Без тебя я бы не справился.,0,household_chat,student_manual_annotation
+CUS-RU-015,ru,Для отмены перевода на 45 000 ₸ сообщите сотруднику банка код подтверждения из SMS.,1,fake_bank,student_manual_annotation
+CUS-RU-016,ru,"Кот опять залез на шкаф. Сфотографировала, посмотри, какой смешной.",0,household_chat,student_manual_annotation
+CUS-RU-017,ru,Ваша карта заблокирована! Срочно подтвердите данные по ссылке: http://secure-bank-verify.example/login,1,card_block,student_manual_annotation
+CUS-RU-018,ru,"Купи, пожалуйста, корм для кота по дороге домой. Деньги переведу вечером.",0,household_chat,student_manual_annotation
+CUS-RU-019,ru,Карта заблокирована по требованию Центробанка. Разблокируйте её на http://card-unblock.example/ru,1,card_block,student_manual_annotation
+CUS-RU-020,ru,"Мы уже в парке, ждём вас у фонтана. Возьмите плед, здесь прохладно.",0,household_chat,student_manual_annotation
+CUS-RU-021,ru,Внимание! Ваша банковская карта будет аннулирована через 24 часа. Заполните форму: http://card-renewal.test/form,1,card_block,student_manual_annotation
+CUS-RU-022,ru,Привет! Встречаемся завтра в 18:00 у входа в библиотеку.,0,meeting_reminder,student_manual_annotation
+CUS-RU-023,ru,Банк: замечена подозрительная активность. Карта приостановлена. Подтвердите владение на http://card-holder-check.example,1,card_block,student_manual_annotation
+CUS-RU-024,ru,"Напоминаю: планёрка перенесена на 10:30, комната 305.",0,meeting_reminder,student_manual_annotation
+CUS-RU-025,ru,"Чтобы избежать блокировки карты, срочно обновите привязанный номер телефона по ссылке http://bank-update.test/phone",1,card_block,student_manual_annotation
+CUS-RU-026,ru,Не забудь про встречу с врачом завтра в 14:00.,0,meeting_reminder,student_manual_annotation
+CUS-RU-027,ru,Ваша карта попала в список скомпрометированных. Замените ПИН-код на http://pin-change.example/secure,1,card_block,student_manual_annotation
+CUS-RU-028,ru,"Созвон с командой в 16:00, ссылка в календаре. Присоединяйся.",0,meeting_reminder,student_manual_annotation
+CUS-RU-029,ru,Служба мониторинга: карта заблокирована из-за попытки оплаты за рубежом. Подтвердите операцию: http://foreign-payment.example/check,1,card_block,student_manual_annotation
+CUS-RU-030,ru,"В субботу идём в кино? Начало в 19:20, билеты уже куплены.",0,meeting_reminder,student_manual_annotation
+CUS-RU-031,ru,Сотрудник службы безопасности банка: назовите код из SMS для отмены подозрительной операции.,1,sms_code_request,student_manual_annotation
+CUS-RU-032,ru,"Ужин с родителями в воскресенье в 17:00. Ничего не готовь, всё сделаю сама.",0,meeting_reminder,student_manual_annotation
+CUS-RU-033,ru,"Здравствуйте, я из банка. Продиктуйте код подтверждения из четырёх цифр, чтобы мы отменили мошеннический перевод.",1,sms_code_request,student_manual_annotation
+CUS-RU-034,ru,Напоминаю о встрече с клиентом в 11:00 в офисе на втором этаже.,0,meeting_reminder,student_manual_annotation
+CUS-RU-035,ru,Для возврата ошибочно списанных средств сообщите код из SMS нашему оператору.,1,sms_code_request,student_manual_annotation
+CUS-RU-036,ru,Завтра в 9:00 утра собрание в актовом зале. Не опаздывай.,0,meeting_reminder,student_manual_annotation
+CUS-RU-037,ru,"Курьер не может передать посылку. Назовите код из SMS, чтобы подтвердить адрес доставки.",1,sms_code_request,student_manual_annotation
+CUS-RU-038,ru,Через час встречаемся у спортзала. Возьми форму.,0,meeting_reminder,student_manual_annotation
+CUS-RU-039,ru,Ваш аккаунт на госуслугах взломан. Для восстановления доступа отправьте код подтверждения в ответном сообщении.,1,sms_code_request,student_manual_annotation
+CUS-RU-040,ru,В пятницу после работы идём в кафе. Сбор в 18:30 у входа.,0,meeting_reminder,student_manual_annotation
+CUS-RU-041,ru,"Служба поддержки: чтобы закрыть заявку, продиктуйте последние четыре цифры кода из сообщения.",1,sms_code_request,student_manual_annotation
+CUS-RU-042,ru,Ваш заказ №4821 оформлен и передан в доставку. Ожидайте курьера завтра.,0,delivery_notification,student_manual_annotation
+CUS-RU-043,ru,Не сообщайте код никому. Но для проверки личности всё же назовите его оператору прямо сейчас.,1,sms_code_request,student_manual_annotation
+CUS-RU-044,ru,"Заказ №5520 готов к выдаче в пункте на улице Ленина, 10. Режим работы: 10:00–20:00.",0,delivery_notification,student_manual_annotation
+CUS-RU-045,ru,"Техническая поддержка маркетплейса: подтвердите вход кодом из SMS, иначе заказ будет отменён.",1,sms_code_request,student_manual_annotation
+CUS-RU-046,ru,"Курьер прибудет сегодня с 18:00 до 20:00. Пожалуйста, будьте на связи.",0,delivery_notification,student_manual_annotation
+CUS-RU-047,ru,Поздравляем! Вы выиграли смартфон в розыгрыше. Заберите приз: http://bit.ly/test-prize-24,1,prize_win,student_manual_annotation
+CUS-RU-048,ru,Посылка доставлена в постамат №12. Код получения придёт в приложении.,0,delivery_notification,student_manual_annotation
+CUS-RU-049,ru,Ваш номер выбран победителем акции. Получите 10 000 ₸ на карту после оплаты комиссии 199 ₸.,1,prize_win,student_manual_annotation
+CUS-RU-050,ru,Ваш заказ отправлен. Ориентировочная дата доставки — понедельник.,0,delivery_notification,student_manual_annotation
+CUS-RU-051,ru,Вы выиграли путёвку на двоих! Осталось оплатить сбор 500 ₸: http://travel-prize.test/pay,1,prize_win,student_manual_annotation
+CUS-RU-052,ru,Доставка перенесена на завтра из-за погодных условий. Приносим извинения.,0,delivery_notification,student_manual_annotation
+CUS-RU-053,ru,Розыгрыш завершён. Ваш приз ждёт вас. Перейдите по ссылке http://bonus-claim.example/get,1,prize_win,student_manual_annotation
+CUS-RU-054,ru,Заказ можно забрать в магазине до 21:00. Покажите штрихкод из приложения.,0,delivery_notification,student_manual_annotation
+CUS-RU-055,ru,"Ура! Вы стали тысячным покупателем. Заберите подарочную карту, указав данные на http://gift-card.test/activate",1,prize_win,student_manual_annotation
+CUS-RU-056,ru,"Курьер уже подъехал к вашему дому. Пожалуйста, откройте дверь.",0,delivery_notification,student_manual_annotation
+CUS-RU-057,ru,"Ваш аккаунт получил 5000 бонусов. Активируйте их по ссылке http://bonus-activate.example, пока не сгорели.",1,prize_win,student_manual_annotation
+CUS-RU-058,ru,Ваш заказ возвращён на склад из-за неверного адреса. Свяжитесь с поддержкой в приложении.,0,delivery_notification,student_manual_annotation
+CUS-RU-059,ru,Вы победили в лотерее от известного магазина. Для получения выигрыша оплатите налог 350 ₸ по ссылке http://lottery-tax.example/pay,1,prize_win,student_manual_annotation
+CUS-RU-060,ru,"Спасибо за покупку! Оцените доставку в приложении, если будет время.",0,delivery_notification,student_manual_annotation
+CUS-RU-061,ru,Ваша посылка ожидает оплаты таможенного сбора 350 ₸: http://post-delivery-pay.example,1,delivery_fee,student_manual_annotation
+CUS-RU-062,ru,Код подтверждения: 4821. Никому не сообщайте этот код.,0,otp_notification,student_manual_annotation
+CUS-RU-063,ru,"Посылка задержана на складе. Оплатите хранение 120 ₸ по ссылке http://parcel-storage.test/pay, иначе её вернут отправителю.",1,delivery_fee,student_manual_annotation
+CUS-RU-064,ru,"Ваш код для входа: 7364. Никому не сообщайте код, даже сотрудникам банка.",0,otp_notification,student_manual_annotation
+CUS-RU-065,ru,Курьерская служба: доставка невозможна без оплаты пошлины. Перейдите на http://delivery-fee.example/confirm,1,delivery_fee,student_manual_annotation
+CUS-RU-066,ru,Подтверждение номера: 1209. Код действует 5 минут. Никому не сообщайте его.,0,otp_notification,student_manual_annotation
+CUS-RU-067,ru,Ваш заказ ждёт на пункте выдачи. Доплатите 250 ₸ за доставку: http://order-extra.test/payment,1,delivery_fee,student_manual_annotation
+CUS-RU-068,ru,Код для восстановления пароля: 8842. Никому не сообщайте код.,0,otp_notification,student_manual_annotation
+CUS-RU-069,ru,Международная посылка требует таможенной очистки. Оплатите 480 ₸ на http://customs-clear.example,1,delivery_fee,student_manual_annotation
+CUS-RU-070,ru,Ваш одноразовый пароль: 5590. Не передавайте его третьим лицам.,0,otp_notification,student_manual_annotation
+CUS-RU-071,ru,Почта: из-за неверного адреса посылка возвращается. Подтвердите новый адрес и оплатите переадресацию на http://post-redirect.example,1,delivery_fee,student_manual_annotation
+CUS-RU-072,ru,Для подтверждения оплаты введите код 9013. Никому не сообщайте код.,0,otp_notification,student_manual_annotation
+CUS-RU-073,ru,"Доставка приостановлена. Чтобы получить груз, оплатите страховку 300 ₸ по ссылке http://cargo-insurance.test/pay",1,delivery_fee,student_manual_annotation
+CUS-RU-074,ru,"Вход в приложение: код 2277. Если это были не вы, смените пароль. Код никому не сообщайте.",0,otp_notification,student_manual_annotation
+CUS-RU-075,ru,"Мама, у меня проблемы, срочно переведи 50 000 на этот номер, потом всё объясню. Никому не говори.",1,family_emergency,student_manual_annotation
+CUS-RU-076,ru,Код активации: 6402. Он действует 10 минут. Никому его не сообщайте.,0,otp_notification,student_manual_annotation
+CUS-RU-077,ru,"Папа, я попал в беду, нужны деньги на штраф. Переведи срочно, телефон разряжается.",1,family_emergency,student_manual_annotation
+CUS-RU-078,ru,Новый вход в аккаунт с вашего устройства. Код подтверждения: 3158. Никому не сообщайте.,0,otp_notification,student_manual_annotation
+CUS-RU-079,ru,"Мама, это я, у меня украли телефон. Переведи 30 000 на новый номер, я всё расскажу вечером.",1,family_emergency,student_manual_annotation
+CUS-RU-080,ru,Код для смены пароля: 7710. Никому не сообщайте код и не пересылайте сообщение.,0,otp_notification,student_manual_annotation
+CUS-RU-081,ru,"Сынок, я в больнице, срочно нужны деньги на лекарства. Переведи на карту, которую я укажу.",1,family_emergency,student_manual_annotation
+CUS-RU-082,ru,"Завтра первая пара по математике в 8:30, аудитория 214.",0,class_schedule,student_manual_annotation
+CUS-RU-083,ru,"Это твоя дочь. Меня задержали, нужен залог. Никому не звони, переведи 80 000.",1,family_emergency,student_manual_annotation
+CUS-RU-084,ru,"Расписание на четверг: физика в 10:00, затем лабораторная в 12:00.",0,class_schedule,student_manual_annotation
+CUS-RU-085,ru,"Брат, срочно нужна помощь. Попал в аварию, переведи деньги на лечение, потом верну.",1,family_emergency,student_manual_annotation
+CUS-RU-086,ru,"Лекция по истории переносится в онлайн, начало в 13:00.",0,class_schedule,student_manual_annotation
+CUS-RU-087,ru,"Мама, не звони мне, я на совещании. Переведи 20 000 коллеге, я объясню позже.",1,family_emergency,student_manual_annotation
+CUS-RU-088,ru,"Не забудь, что в среду семинар по экономике в 15:30.",0,class_schedule,student_manual_annotation
+CUS-RU-089,ru,Госуслуги: у вас образовалась задолженность по налогу. Оплатите штраф по ссылке http://gos-uslugi-fine.example/pay,1,fines_gov,student_manual_annotation
+CUS-RU-090,ru,Изменение в расписании: вместо английского будет практикум по программированию.,0,class_schedule,student_manual_annotation
+CUS-RU-091,ru,Уведомление о штрафе ГИБДД. Проверьте постановление и оплатите со скидкой: http://traffic-fine.test/check,1,fines_gov,student_manual_annotation
+CUS-RU-092,ru,"Консультация перед экзаменом в пятницу в 16:00, кабинет 118.",0,class_schedule,student_manual_annotation
+CUS-RU-093,ru,Служба судебных приставов: возбуждено исполнительное производство. Погасите долг на http://fssp-pay.example,1,fines_gov,student_manual_annotation
+CUS-RU-094,ru,Зачёт по философии состоится в субботу в 9:00 в главном корпусе.,0,class_schedule,student_manual_annotation
+CUS-RU-095,ru,Ваш автомобиль зафиксирован камерой. Оплатите штраф 5000 ₸ в течение 24 часов: http://camera-fine.example,1,fines_gov,student_manual_annotation
+CUS-RU-096,ru,"Сегодня последняя пара отменена, можете быть свободны.",0,class_schedule,student_manual_annotation
+CUS-RU-097,ru,Налоговая служба: обнаружена недоплата. Срочно подтвердите данные на http://tax-check.test/login,1,fines_gov,student_manual_annotation
+CUS-RU-098,ru,Расписание сессии вывесили на сайте университета. Проверь свою группу.,0,class_schedule,student_manual_annotation
+CUS-RU-099,ru,Вам начислен административный штраф. Для обжалования перейдите на http://admin-fine.example/form,1,fines_gov,student_manual_annotation
+CUS-RU-100,ru,Куратор: собрание группы в понедельник после второй пары.,0,class_schedule,student_manual_annotation
+CUS-RU-101,ru,Госуслуги: для получения выплаты подтвердите банковские реквизиты на http://benefit-verify.example,1,fines_gov,student_manual_annotation
+CUS-RU-102,ru,"С днём рождения! Желаю здоровья, счастья и удачи во всех начинаниях.",0,congratulations,student_manual_annotation
+CUS-RU-103,ru,"У вас новый штраф за парковку. Оплатите на http://parking-fine.test, иначе дело передадут приставам.",1,fines_gov,student_manual_annotation
+CUS-RU-104,ru,Поздравляю с защитой диплома! Ты отлично справился.,0,congratulations,student_manual_annotation
+CUS-RU-105,ru,Инвестируйте 10 000 ₸ и получайте 30% в месяц. Гарантированный доход без риска: http://fast-invest.example,1,investment,student_manual_annotation
+CUS-RU-106,ru,С Новым годом! Пусть следующий год принесёт много радости.,0,congratulations,student_manual_annotation
+CUS-RU-107,ru,"Ваш личный трейдер: рынок растёт, самое время войти. Откройте депозит на http://trade-profit.test",1,investment,student_manual_annotation
+CUS-RU-108,ru,С годовщиной свадьбы! Желаю вам долгих счастливых лет вместе.,0,congratulations,student_manual_annotation
+CUS-RU-109,ru,Только сегодня! Криптовалюта с доходностью 5% в день. Начните на http://crypto-gain.example/start,1,investment,student_manual_annotation
+CUS-RU-110,ru,Поздравляю с повышением! Это заслуженная награда за труд.,0,congratulations,student_manual_annotation
+CUS-RU-111,ru,Мы вернём потерянные деньги на бирже. Опытный аналитик поможет. Заявка: http://recovery-trade.test,1,investment,student_manual_annotation
+CUS-RU-112,ru,С первым сентября! Успехов в новом учебном году.,0,congratulations,student_manual_annotation
+CUS-RU-113,ru,"Заработок из дома: вложите 5000 ₸, через неделю получите 25 000. Пишите в ответном сообщении.",1,investment,student_manual_annotation
+CUS-RU-114,ru,С 8 Марта! Пусть каждый день будет весенним и добрым.,0,congratulations,student_manual_annotation
+CUS-RU-115,ru,"Закрытый клуб инвесторов приглашает вас. Гарантия прибыли 40%, вступительный взнос 1000 ₸.",1,investment,student_manual_annotation
+CUS-RU-116,ru,Поздравляю с новосельем! Пусть в новом доме будет тепло и уютно.,0,congratulations,student_manual_annotation
+CUS-RU-117,ru,"Ваш инвестиционный счёт заморожен. Чтобы вывести прибыль, оплатите налог на http://invest-withdraw.example",1,investment,student_manual_annotation
+CUS-RU-118,ru,С рождением сына! Здоровья малышу и родителям.,0,congratulations,student_manual_annotation
+CUS-RU-119,ru,"Персональное предложение: акции перспективной компании по специальной цене. Успейте до конца дня, подробности по ссылке http://example.com/stock-offer",1,investment,student_manual_annotation
+CUS-RU-120,ru,"С юбилеем! Спасибо за твою поддержку и мудрость, будь счастлив.",0,congratulations,student_manual_annotation
+CUS-KK-001,kk,Банк қызметі: шотыңызға күмәнді кіру әрекеті тіркелді. Жедел растаңыз: http://bank-security.example/kk,1,fake_bank,student_manual_annotation
+CUS-KK-002,kk,"Сәлем! Сен үйдесің бе? Мен нан мен сүт сатып алдым, кешкі ас бір сағаттан кейін.",0,household_chat,student_manual_annotation
+CUS-KK-003,kk,Құрметті клиент! Шотыңыз уақытша шектелді. Мына сілтеме арқылы тексеріңіз: http://secure-bank-check.test/kk,1,fake_bank,student_manual_annotation
+CUS-KK-004,kk,"Гүлдерді суаруды ұмытпа, мен келгенше. Кілтті көршіге қалдырдым.",0,household_chat,student_manual_annotation
+CUS-KK-005,kk,Онлайн-банкке кіру үшін деректеріңізді растаңыз: http://online-bank-restore.example,1,fake_bank,student_manual_annotation
+CUS-KK-006,kk,"Қайырлы таң! Мен ерте шықтым, таңғы ас үстелде. Күнің жақсы өтсін!",0,household_chat,student_manual_annotation
+CUS-KK-007,kk,Банк қызметкері: күмәнді аударымды тоқтату үшін SMS-тегі кодты айтыңыз.,1,fake_bank,student_manual_annotation
+CUS-KK-008,kk,"Бүгін суық, курткаңды киіп ал. Кешке жаңбыр жауады дейді.",0,household_chat,student_manual_annotation
+CUS-KK-009,kk,Картаңыз бұғатталды. Жедел түрде мына сілтеме арқылы растаңыз: http://bank-kz-verify.test,1,card_block,student_manual_annotation
+CUS-KK-010,kk,"Кот тағы шкафқа шығып кетті. Суретке түсірдім, қарашы, қандай күлкілі.",0,household_chat,student_manual_annotation
+CUS-KK-011,kk,Картаңыз 24 сағат ішінде жойылады. Деректерді толтырыңыз: http://card-renewal.example/kk,1,card_block,student_manual_annotation
+CUS-KK-012,kk,Сәлем! Ертең сағат 10:00-де кездесеміз бе?,0,meeting_reminder,student_manual_annotation
+CUS-KK-013,kk,Банк: картаңызға күмәнді операция жасалды. Растау үшін http://card-holder-check.test сайтына кіріңіз.,1,card_block,student_manual_annotation
+CUS-KK-014,kk,"Еске саламын: жиналыс 10:30-ға ауыстырылды, 305-кабинет.",0,meeting_reminder,student_manual_annotation
+CUS-KK-015,kk,"Картаны бұғаттаудан сақтану үшін мына сілтемеге өтіп, ПИН-кодты жаңартыңыз: http://pin-change.example",1,card_block,student_manual_annotation
+CUS-KK-016,kk,"Ертең сағат 14:00-де дәрігерге барасың, ұмытпа.",0,meeting_reminder,student_manual_annotation
+CUS-KK-017,kk,"Сәлеметсіз бе, мен банктенмін. Мошенниктердің аударымын тоқтату үшін SMS-тегі кодты айтыңыз.",1,sms_code_request,student_manual_annotation
+CUS-KK-018,kk,"Командамен онлайн кездесу 16:00-де, сілтеме күнтізбеде.",0,meeting_reminder,student_manual_annotation
+CUS-KK-019,kk,Қайтарылған ақшаны алу үшін растау кодын жауап хабарламада жіберіңіз.,1,sms_code_request,student_manual_annotation
+CUS-KK-020,kk,"Сенбіде киноға барамыз ба? Басталуы 19:20-да, билеттер алынды.",0,meeting_reminder,student_manual_annotation
+CUS-KK-021,kk,Жеткізуші сәлемдемені бере алмайды. Мекенжайды растау үшін SMS-тегі кодты айтыңыз.,1,sms_code_request,student_manual_annotation
+CUS-KK-022,kk,"Тапсырысыңыз қабылданып, жеткізуге берілді. Курьерді ертең күтіңіз.",0,delivery_notification,student_manual_annotation
+CUS-KK-023,kk,Мемлекеттік қызмет аккаунтыңыз бұзылды. Қалпына келтіру үшін кодты жіберіңіз.,1,sms_code_request,student_manual_annotation
+CUS-KK-024,kk,"№5520 тапсырыс Ленин көшесі, 10 мекенжайындағы пунктте дайын. Жұмыс уақыты: 10:00–20:00.",0,delivery_notification,student_manual_annotation
+CUS-KK-025,kk,Құттықтаймыз! Сіз телефон ұтып алдыңыз. Сыйлықты алыңыз: http://bit.ly/test-kk-prize,1,prize_win,student_manual_annotation
+CUS-KK-026,kk,Курьер бүгін 18:00–20:00 аралығында келеді. Байланыста болыңыз.,0,delivery_notification,student_manual_annotation
+CUS-KK-027,kk,Сіз акцияның жеңімпазы атандыңыз. 10 000 ₸ алу үшін 199 ₸ комиссия төлеңіз.,1,prize_win,student_manual_annotation
+CUS-KK-028,kk,Сәлемдеме №12 постаматқа жеткізілді. Алу коды қосымшада келеді.,0,delivery_notification,student_manual_annotation
+CUS-KK-029,kk,Тегін жолдама ұтып алдыңыз! Тек 500 ₸ жинау алымын төлеңіз: http://travel-prize.test/kk,1,prize_win,student_manual_annotation
+CUS-KK-030,kk,Тапсырысыңыз жіберілді. Болжамды жеткізу күні — дүйсенбі.,0,delivery_notification,student_manual_annotation
+CUS-KK-031,kk,Сіздің аккаунтыңызға 5000 бонус берілді. Оларды http://bonus-activate.example сайтында іске қосыңыз.,1,prize_win,student_manual_annotation
+CUS-KK-032,kk,Растау коды: 4821. Бұл кодты ешкімге айтпаңыз.,0,otp_notification,student_manual_annotation
+CUS-KK-033,kk,Сәлемдеме кедендік алымды күтуде: 350 ₸. Төлеңіз: http://post-delivery-pay.example/kk,1,delivery_fee,student_manual_annotation
+CUS-KK-034,kk,Кіру коды: 7364. Кодты банк қызметкерлеріне де айтпаңыз.,0,otp_notification,student_manual_annotation
+CUS-KK-035,kk,"Сәлемдеме қоймада ұсталды. 120 ₸ сақтау ақысын төлеңіз, әйтпесе кері қайтарылады: http://parcel-storage.test",1,delivery_fee,student_manual_annotation
+CUS-KK-036,kk,Нөмірді растау: 1209. Код 5 минутқа жарамды. Ешкімге айтпаңыз.,0,otp_notification,student_manual_annotation
+CUS-KK-037,kk,Курьерлік қызмет: жеткізу үшін қосымша төлем қажет. http://delivery-fee.example/kk сілтемесіне өтіңіз.,1,delivery_fee,student_manual_annotation
+CUS-KK-038,kk,Құпия сөзді қалпына келтіру коды: 8842. Кодты ешкімге айтпаңыз.,0,otp_notification,student_manual_annotation
+CUS-KK-039,kk,Халықаралық сәлемдеме кеденнен өтуі үшін 480 ₸ төлеңіз: http://customs-clear.example/kk,1,delivery_fee,student_manual_annotation
+CUS-KK-040,kk,Бір реттік құпия сөз: 5590. Оны үшінші тұлғаларға бермеңіз.,0,otp_notification,student_manual_annotation
+CUS-KK-041,kk,"Апа, мен қиын жағдайға тап болдым, жедел 50 000 аударып жібер. Кейін түсіндіремін.",1,family_emergency,student_manual_annotation
+CUS-KK-042,kk,"Ертең бірінші сабақ математикадан 8:30-да, 214-аудитория.",0,class_schedule,student_manual_annotation
+CUS-KK-043,kk,"Әке, мен апатқа ұшырадым, емделуге ақша керек. Жедел аударып жіберші.",1,family_emergency,student_manual_annotation
+CUS-KK-044,kk,"Бейсенбі кестесі: физика 10:00-де, содан кейін зертхана 12:00-де.",0,class_schedule,student_manual_annotation
+CUS-KK-045,kk,"Мама, телефонымды ұрлап кетті. Жаңа нөмірге 30 000 аудар, кешке түсіндіремін.",1,family_emergency,student_manual_annotation
+CUS-KK-046,kk,"Тарих дәрісі онлайн өтеді, басталуы 13:00-де.",0,class_schedule,student_manual_annotation
+CUS-KK-047,kk,"Бауыр, мені ұстап алып кетті, кепіл үшін ақша керек. Ешкімге айтпа, жедел аудар.",1,family_emergency,student_manual_annotation
+CUS-KK-048,kk,Сәрсенбіде экономика семинары 15:30-да екенін ұмытпа.,0,class_schedule,student_manual_annotation
+CUS-KK-049,kk,Мемлекеттік қызмет: салық бойынша берешегіңіз бар. Айыппұлды төлеңіз: http://gos-uslugi-fine.example/kk,1,fines_gov,student_manual_annotation
+CUS-KK-050,kk,Кесте өзгерді: ағылшын тілінің орнына бағдарламалау практикумы болады.,0,class_schedule,student_manual_annotation
+CUS-KK-051,kk,"Жол ережесін бұзғаныңыз үшін айыппұл. Қаулыны тексеріп, төлеңіз: http://traffic-fine.test/kk",1,fines_gov,student_manual_annotation
+CUS-KK-052,kk,"Туған күніңмен! Денсаулық, бақыт және барлық істе сәттілік тілеймін.",0,congratulations,student_manual_annotation
+CUS-KK-053,kk,Сот орындаушылары: іс қозғалды. Қарызды мына сілтеме арқылы өтеңіз: http://fssp-pay.example/kk,1,fines_gov,student_manual_annotation
+CUS-KK-054,kk,Дипломды қорғағаныңмен құттықтаймын! Сен тамаша жеңдің.,0,congratulations,student_manual_annotation
+CUS-KK-055,kk,Сіздің көлігіңіз камераға түсті. 5000 ₸ айыппұлды 24 сағат ішінде төлеңіз: http://camera-fine.example/kk,1,fines_gov,student_manual_annotation
+CUS-KK-056,kk,Жаңа жылмен! Келер жыл көп қуаныш әкелсін.,0,congratulations,student_manual_annotation
+CUS-KK-057,kk,"10 000 ₸ салып, айына 30% табыс алыңыз. Кепілді кіріс: http://fast-invest.example/kk",1,investment,student_manual_annotation
+CUS-KK-058,kk,Тойға берілген жылдығыңмен! Ұзақ бақытты жылдар тілеймін.,0,congratulations,student_manual_annotation
+CUS-KK-059,kk,Жеке трейдер: нарық өсіп жатыр. Депозит ашыңыз: http://trade-profit.test/kk,1,investment,student_manual_annotation
+CUS-KK-060,kk,Жаңа үймен құттықтаймын! Жаңа үйің жылы әрі жайлы болсын.,0,congratulations,student_manual_annotation
