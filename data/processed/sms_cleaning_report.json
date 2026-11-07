@@ -1,0 +1,41 @@
+{
+  "initial_count": 5574,
+  "empty_removed": 2,
+  "duplicates_removed": 472,
+  "duplicates_by_class": {
+    "0": 324,
+    "1": 148
+  },
+  "final_count": 5100,
+  "raw_class_counts": {
+    "ham": 4827,
+    "spam": 747
+  },
+  "clean_class_counts": {
+    "ham": 4501,
+    "spam": 599,
+    "ham_pct": 88.25,
+    "spam_pct": 11.75,
+    "imbalance_ratio": 7.51
+  },
+  "splits_summary": {
+    "train_indices": {
+      "total": 3570,
+      "ham": 3151,
+      "spam": 419,
+      "spam_pct": 11.74
+    },
+    "val_indices": {
+      "total": 765,
+      "ham": 675,
+      "spam": 90,
+      "spam_pct": 11.76
+    },
+    "test_indices": {
+      "total": 765,
+      "ham": 675,
+      "spam": 90,
+      "spam_pct": 11.76
+    }
+  }
+}
