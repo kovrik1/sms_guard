@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Регистрация — SMS Guard{% endblock %}
+
+{% block auth_content %}
+<div class="sg-auth-container">
+    <div class="sg-auth-card">
+        <div class="text-center mb-4">
+            <div class="fs-2 mb-1">🛡️</div>
+            <h1 class="h4 fw-bold mb-1">Регистрация в SMS Guard</h1>
+            <p class="text-muted small mb-0">
+                Создайте учётную запись для проверки SMS-сообщений и ссылок
+            </p>
+        </div>
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger small py-2" role="alert">
+                {% for err in form.non_field_errors %}
+                    <div>{{ err }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'accounts:register' %}" novalidate>
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="{{ form.username.id_for_label }}" class="form-label fw-semibold">
+                    {{ form.username.label }}
+                </label>
+                {{ form.username }}
+                <div class="form-text small">От 3 до 30 символов: латинские буквы, цифры и символ _</div>
+                {% if form.username.errors %}
+                    <div class="text-danger small mt-1">
+                        {% for err in form.username.errors %}{{ err }}{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.email.id_for_label }}" class="form-label fw-semibold">
+                    {{ form.email.label }}
+                </label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="text-danger small mt-1">
+                        {% for err in form.email.errors %}{{ err }}{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.password.id_for_label }}" class="form-label fw-semibold">
+                    {{ form.password.label }}
+                </label>
+                {{ form.password }}
+                <div class="form-text small">Не менее 8 символов, обязательно наличие букв и цифр</div>
+                {% if form.password.errors %}
+                    <div class="text-danger small mt-1">
+                        {% for err in form.password.errors %}{{ err }}{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-4">
+                <label for="{{ form.password_confirm.id_for_label }}" class="form-label fw-semibold">
+                    {{ form.password_confirm.label }}
+                </label>
+                {{ form.password_confirm }}
+                {% if form.password_confirm.errors %}
+                    <div class="text-danger small mt-1">
+                        {% for err in form.password_confirm.errors %}{{ err }}{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                Зарегистрироваться
+            </button>
+        </form>
+
+        <div class="text-center mt-3 pt-3 border-top">
+            <span class="text-muted small">Уже есть аккаунт?</span>
+            <a href="{% url 'accounts:login' %}" class="small fw-semibold text-decoration-none ms-1">
+                Войти в систему
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

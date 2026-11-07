@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}История проверок — SMS Guard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h1 class="h3 fw-bold mb-1">История проверок</h1>
+        <p class="text-muted mb-0">
+            Персональный журнал выполненных проверок SMS и URL (найдено записей: {{ total_filtered }})
+        </p>
+    </div>
+    <div>
+        <a href="{% url 'analysis:history_export' %}{% if filter_query_string %}?{{ filter_query_string }}{% endif %}" class="btn btn-outline-primary btn-sm">
+            📥 Экспорт в CSV
+        </a>
+    </div>
+</div>
+
+<!-- Панель фильтров с сохранением состояния в адресной строке (Задание 16 п. 5, Раздел 9.5) -->
+<div class="sg-card p-3 mb-4">
+    <form method="get" action="{% url 'analysis:history' %}" class="row g-2 align-items-end">
+        <div class="col-6 col-md-2">
+            <label for="f-date-from" class="form-label small fw-semibold mb-1">Дата с:</label>
+            <input type="date" id="f-date-from" name="date_from" value="{{ filters.date_from }}" class="form-control form-control-sm">
+        </div>
+        <div class="col-6 col-md-2">
+            <label for="f-date-to" class="form-label small fw-semibold mb-1">Дата по:</label>
+            <input type="date" id="f-date-to" name="date_to" value="{{ filters.date_to }}" class="form-control form-control-sm">
+        </div>
+        <div class="col-6 col-md-2">
+            <label for="f-type" class="form-label small fw-semibold mb-1">Тип проверки:</label>
+            <select id="f-type" name="type" class="form-select form-select-sm">
+                <option value="">Все типы</option>
+                <option value="SMS" {% if filters.type == 'SMS' %}selected{% endif %}>SMS</option>
+                <option value="URL" {% if filters.type == 'URL' %}selected{% endif %}>URL</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-2">
+            <label for="f-category" class="form-label small fw-semibold mb-1">Категория:</label>
+            <select id="f-category" name="category" class="form-select form-select-sm">
+                <option value="">Все категории</option>
+                <option value="SAFE" {% if filters.category == 'SAFE' %}selected{% endif %}>Безопасное (SAFE)</option>
+                <option value="SUSPICIOUS" {% if filters.category == 'SUSPICIOUS' %}selected{% endif %}>Подозрительное (SUSPICIOUS)</option>
+                <option value="FRAUDULENT" {% if filters.category == 'FRAUDULENT' %}selected{% endif %}>Мошенническое (FRAUDULENT)</option>
+                <option value="DANGEROUS" {% if filters.category == 'DANGEROUS' %}selected{% endif %}>Опасная ссылка (DANGEROUS)</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-2">
+            <label for="f-risk" class="form-label small fw-semibold mb-1">Уровень риска:</label>
+            <select id="f-risk" name="risk_level" class="form-select form-select-sm">
+                <option value="">Все уровни</option>
+                <option value="LOW" {% if filters.risk_level == 'LOW' %}selected{% endif %}>Низкий (LOW)</option>
+                <option value="MEDIUM" {% if filters.risk_level == 'MEDIUM' %}selected{% endif %}>Средний (MEDIUM)</option>
+                <option value="HIGH" {% if filters.risk_level == 'HIGH' %}selected{% endif %}>Высокий (HIGH)</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-sm w-100">Фильтровать</button>
+            <a href="{% url 'analysis:history' %}" class="btn btn-outline-secondary btn-sm">Сброс</a>
+        </div>
+    </form>
+</div>
+
+<!-- Таблица истории (пагинация по 20 записей, Раздел 9.5) -->
+<div class="sg-card p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light small">
+                <tr>
+                    <th>Дата и время</th>
+                    <th>Тип</th>
+                    <th>Фрагмент (до 60 симв.)</th>
+                    <th>Категория</th>
+                    <th>Уровень риска</th>
+                    <th>Risk Score</th>
+                    <th class="text-end">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in page_obj %}
+                <tr>
+                    <td class="text-nowrap small text-muted">{{ item.created_at|date:"d.m.Y H:i" }}</td>
+                    <td>
+                        <span class="badge {% if item.check_type == 'SMS' %}bg-primary{% else %}bg-info text-dark{% endif %}">
+                            {{ item.check_type }}
+                        </span>
+                    </td>
+                    <td class="font-monospace small">{{ item.snippet }}</td>
+                    <td>
+                        {% if item.category == 'SAFE' %}
+                            <span class="sg-badge sg-badge-safe">✓ Безопасное</span>
+                        {% elif item.category == 'SUSPICIOUS' %}
+                            <span class="sg-badge sg-badge-suspicious">⚠ Подозрительное</span>
+                        {% elif item.category == 'DANGEROUS' %}
+                            <span class="sg-badge sg-badge-dangerous">⛔ Опасная ссылка</span>
+                        {% else %}
+                            <span class="sg-badge sg-badge-fraudulent">⛔ Мошенническое</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="sg-badge sg-badge-{{ item.risk_level }}">
+                            {{ item.get_risk_level_display }}
+                        </span>
+                    </td>
+                    <td class="fw-bold">{{ item.risk_score }} / 100</td>
+                    <td class="text-end text-nowrap">
+                        <a href="{% url 'analysis:check_detail' item.id %}" class="btn btn-sm btn-outline-primary me-1">
+                            Подробнее
+                        </a>
+                        <form method="post" action="{% url 'analysis:check_delete' item.id %}" class="d-inline" onsubmit="return confirm('Удалить запись проверки #{{ item.id }}?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить запись">🗑</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">
+                        Записи проверок по заданным критериям не найдены.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav aria-label="Пагинация истории" class="mt-3 pt-2 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span class="small text-muted">
+            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+        </span>
+        <ul class="pagination pagination-sm mb-0">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if filter_query_string %}&{{ filter_query_string }}{% endif %}">← Предыдущая</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">← Предыдущая</span></li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if filter_query_string %}&{{ filter_query_string }}{% endif %}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if filter_query_string %}&{{ filter_query_string }}{% endif %}">Следующая →</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Следующая →</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

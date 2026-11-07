@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% block title %}Результат проверки #{{ check.id }} — SMS Guard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb small mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'analysis:history' %}">История проверок</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Проверка #{{ check.id }}</li>
+            </ol>
+        </nav>
+        <h1 class="h3 fw-bold mb-0">Подробный отчёт о проверке #{{ check.id }}</h1>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'analysis:history' %}" class="btn btn-outline-secondary btn-sm">← К списку истории</a>
+        <form method="post" action="{% url 'analysis:check_delete' check.id %}" onsubmit="return confirm('Удалить запись проверки #{{ check.id }}?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger btn-sm">🗑 Удалить запись</button>
+        </form>
+    </div>
+</div>
+
+<div class="sg-card p-4 mb-4">
+    <!-- Заголовок результата (Раздел 8.1) -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pb-3 mb-4 border-bottom">
+        <div>
+            <div class="small text-secondary mb-1">
+                Тип проверки: <strong>{{ check.check_type }}</strong> · Дата: <strong>{{ check.created_at|date:"d.m.Y H:i:s" }}</strong>
+            </div>
+            {% if check.category == 'SAFE' %}
+                <span class="sg-badge sg-badge-lg sg-badge-safe">
+                    ✓ Результат проверки: {% if check.check_type == 'URL' %}БЕЗОПАСНАЯ ССЫЛКА{% else %}БЕЗОПАСНОЕ СООБЩЕНИЕ{% endif %}
+                </span>
+            {% elif check.category == 'SUSPICIOUS' %}
+                <span class="sg-badge sg-badge-lg sg-badge-suspicious">
+                    ⚠ Результат проверки: {% if check.check_type == 'URL' %}ПОДОЗРИТЕЛЬНАЯ ССЫЛКА{% else %}ПОДОЗРИТЕЛЬНОЕ СООБЩЕНИЕ{% endif %}
+                </span>
+            {% elif check.category == 'DANGEROUS' %}
+                <span class="sg-badge sg-badge-lg sg-badge-dangerous">
+                    ⛔ Результат проверки: ПОТЕНЦИАЛЬНО ОПАСНАЯ ССЫЛКА
+                </span>
+            {% else %}
+                <span class="sg-badge sg-badge-lg sg-badge-fraudulent">
+                    ⛔ Результат проверки: МОШЕННИЧЕСКОЕ СООБЩЕНИЕ
+                </span>
+            {% endif %}
+        </div>
+        <div class="text-md-end">
+            <span class="sg-badge sg-badge-{{ check.risk_level }} mb-1">
+                Уровень риска: {{ check.get_risk_level_display }} · Risk Score: {{ check.risk_score }}/100
+            </span>
+            <div class="small text-muted">
+                Язык: <strong>{{ check.language }}</strong> · Версии моделей: SMS v{{ check.sms_model_version }}, URL v{{ check.url_model_version }}
+            </div>
+        </div>
+    </div>
+
+    {% if check.language_warning %}
+    <div class="alert alert-warning small py-2 mb-4">
+        ⚠ {{ check.language_warning }}
+    </div>
+    {% endif %}
+
+    <!-- Метрики и вероятности моделей -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-4">
+            <div class="p-3 border rounded bg-light h-100">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="small text-secondary">Итоговый показатель (Risk Score)</span>
+                    <span class="fw-bold">{{ check.risk_score }} / 100</span>
+                </div>
+                <div class="sg-risk-meter">
+                    <div class="sg-risk-meter-fill sg-risk-fill-{{ check.risk_level }}" style="width: {{ check.risk_score }}%;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4">
+            <div class="p-3 border rounded bg-light h-100">
+                <div class="small text-secondary">Вероятность мошенничества SMS (P_sms)</div>
+                <div class="fs-5 fw-bold mt-1">
+                    {% if check.p_sms != None %}{{ check.p_sms|floatformat:4 }}{% else %}Н/Д (проверка URL){% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4">
+            <div class="p-3 border rounded bg-light h-100">
+                <div class="small text-secondary">Максимальная вероятность опасности URL (P_url)</div>
+                <div class="fs-5 fw-bold mt-1">
+                    {% if check.p_url_max != None %}{{ check.p_url_max|floatformat:4 }}{% else %}Ссылки отсутствуют{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Исходный или маскированный текст / неактивный URL (Раздел 8.1) -->
+    <div class="mb-4">
+        <h2 class="h6 fw-bold mb-2">
+            {% if check.check_type == 'URL' %}
+                Проверяемый URL (неактивный текст, домен выделен):
+            {% else %}
+                Текст сообщения {% if not check.input_text %}(маскированная версия — без хранения ПДн){% endif %}:
+            {% endif %}
+        </h2>
+        {% if check.check_type == 'URL' and primary_url_parts %}
+            <div>
+                <span class="url-nonclickable">{{ primary_url_parts.prefix }}<strong class="url-domain-highlight">{{ primary_url_parts.domain }}</strong>{{ primary_url_parts.suffix }}</span>
+            </div>
+        {% else %}
+            <div class="p-3 bg-light border rounded font-monospace">{{ check.display_text }}</div>
+        {% endif %}
+    </div>
+
+    <!-- Обнаруженные подозрительные признаки -->
+    <div class="mb-4">
+        <h2 class="h6 fw-bold mb-2">Обнаруженные подозрительные признаки:</h2>
+        <div>
+            {% for df in check.detected_features.all %}
+                <span class="badge bg-secondary me-2 mb-2 py-2 px-3">{{ df.code }}: {{ df.title }} (вес {{ df.weight }})</span>
+            {% empty %}
+                <span class="text-muted">Подозрительные признаки социальной инженерии не зафиксированы.</span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Объяснение результата -->
+    <div class="mb-4">
+        <h2 class="h6 fw-bold mb-2">Объяснение результата:</h2>
+        <ul class="list-group">
+            {% for item in check.explanation %}
+                <li class="list-group-item">{{ item }}</li>
+            {% empty %}
+                <li class="list-group-item text-muted">Признаки угроз не обнаружены.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Рекомендация пользователю -->
+    <div class="alert alert-info mb-4">
+        <strong>💡 Рекомендация:</strong> {{ check.recommendation }}
+    </div>
+
+    <!-- Разбор найденных ссылок (если есть) -->
+    {% if urls_enriched %}
+    <div class="mb-3">
+        <h2 class="h6 fw-bold mb-3">Детальный разбор проанализированных ссылок ({{ urls_enriched|length }} шт.)</h2>
+        {% for u_item in urls_enriched %}
+        <div class="border rounded p-3 mb-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <div>
+                    <span class="url-nonclickable">
+                        {{ u_item.parts.prefix }}<strong class="url-domain-highlight">{{ u_item.parts.domain }}</strong>{{ u_item.parts.suffix }}
+                    </span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="small fw-semibold">P_url = {{ u_item.obj.p_url|floatformat:4 }}</span>
+                    {% if u_item.obj.category == 'SAFE' %}
+                        <span class="sg-badge sg-badge-safe">✓ Безопасная</span>
+                    {% elif u_item.obj.category == 'SUSPICIOUS' %}
+                        <span class="sg-badge sg-badge-suspicious">⚠ Подозрительная</span>
+                    {% else %}
+                        <span class="sg-badge sg-badge-dangerous">⛔ Потенциально опасная</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if u_item.feature_rows %}
+            <details {% if check.check_type == 'URL' %}open{% endif %}>
+                <summary class="small fw-semibold text-primary mb-2" style="cursor: pointer;">
+                    Структурные признаки ссылки (22 показателя, сработавшие выделены)
+                </summary>
+                <div class="table-responsive mt-2">
+                    <table class="table table-sm table-bordered align-middle mb-0 small">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 50px;">№</th>
+                                <th>Признак</th>
+                                <th style="width: 150px;">Значение</th>
+                                <th style="width: 130px;">Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in u_item.feature_rows %}
+                            <tr class="{% if row.triggered %}feature-row-triggered{% endif %}">
+                                <td>{{ row.num }}</td>
+                                <td>{{ row.label }}</td>
+                                <td class="font-monospace">{{ row.display_value }}</td>
+                                <td>
+                                    {% if row.triggered %}
+                                        <span class="sg-badge sg-badge-suspicious">⚠ Сработал</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-secondary border">Норма</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Обязательное предупреждение о вероятностном характере (Раздел 2.5, 8.1) -->
+    <div class="pt-3 border-top small text-muted d-flex justify-content-between flex-wrap">
+        <span>⚠️ {{ check.disclaimer }}</span>
+        <span>Дата проверки: {{ check.created_at|date:"d.m.Y H:i:s" }}</span>
+    </div>
+</div>
+{% endblock %}

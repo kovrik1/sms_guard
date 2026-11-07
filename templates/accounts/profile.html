@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}Профиль пользователя — SMS Guard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h1 class="h3 fw-bold mb-1">Профиль и настройки приватности</h1>
+        <p class="text-muted mb-0">Управление согласием на хранение текстов SMS, смена пароля и очистка истории</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Карточка учётной записи и настроек приватности -->
+    <div class="col-12 col-lg-6">
+        <div class="sg-card p-4 h-100">
+            <h2 class="h5 fw-bold mb-3">Учётные данные и конфиденциальность</h2>
+            <div class="mb-3 p-3 bg-light rounded border">
+                <div class="row mb-2">
+                    <div class="col-5 text-secondary">Логин:</div>
+                    <div class="col-7 fw-semibold">{{ user.username }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-5 text-secondary">E-mail:</div>
+                    <div class="col-7">{{ user.email|default:"—" }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-5 text-secondary">Роль в системе:</div>
+                    <div class="col-7">
+                        {% if user.is_staff %}
+                            <span class="badge bg-warning text-dark">Администратор</span>
+                        {% else %}
+                            <span class="badge bg-primary">Пользователь</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5 text-secondary">Проверок в истории:</div>
+                    <div class="col-7 fw-semibold">{{ total_checks }}</div>
+                </div>
+            </div>
+
+            <form method="post" action="{% url 'accounts:profile' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_settings">
+
+                <div class="form-check form-switch mb-3 p-3 border rounded">
+                    {{ settings_form.store_sms_text }}
+                    <label class="form-check-label fw-semibold ms-2" for="{{ settings_form.store_sms_text.id_for_label }}">
+                        Согласие на сохранение исходного текста SMS в истории
+                    </label>
+                    <div class="form-text mt-1">
+                        По умолчанию выключено (ФТ-2.7, НФТ-9). Без согласия в базе данных сохраняется только
+                        маскированная версия сообщения, в которой номера карт, телефонов и денежные суммы заменены на <code>***</code>.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ settings_form.preferred_language.id_for_label }}" class="form-label fw-semibold">
+                        {{ settings_form.preferred_language.label }}
+                    </label>
+                    {{ settings_form.preferred_language }}
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Сохранить настройки
+                </button>
+            </form>
+
+            <hr class="my-4">
+
+            <h3 class="h6 fw-bold text-danger mb-2">Управление персональной историей</h3>
+            <p class="small text-secondary mb-3">
+                Вы можете безвозвратно удалить все свои записи проверок ({{ total_checks }} шт.) из базы данных.
+            </p>
+            <form method="post" action="{% url 'accounts:delete_history' %}" onsubmit="return confirm('Вы уверены, что хотите безвозвратно удалить всю свою историю проверок?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger">
+                    🗑 Удалить всю мою историю
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Карточка смены пароля -->
+    <div class="col-12 col-lg-6">
+        <div class="sg-card p-4 h-100">
+            <h2 class="h5 fw-bold mb-3">Смена пароля</h2>
+            <form method="post" action="{% url 'accounts:profile' %}" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="action" value="change_password">
+
+                <div class="mb-3">
+                    <label for="{{ password_form.old_password.id_for_label }}" class="form-label fw-semibold">
+                        {{ password_form.old_password.label }}
+                    </label>
+                    {{ password_form.old_password }}
+                    {% if password_form.old_password.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for err in password_form.old_password.errors %}{{ err }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ password_form.new_password1.id_for_label }}" class="form-label fw-semibold">
+                        {{ password_form.new_password1.label }}
+                    </label>
+                    {{ password_form.new_password1 }}
+                    <div class="form-text small">Минимум 8 символов, обязательно сочетание букв и цифр</div>
+                    {% if password_form.new_password1.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for err in password_form.new_password1.errors %}{{ err }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ password_form.new_password2.id_for_label }}" class="form-label fw-semibold">
+                        {{ password_form.new_password2.label }}
+                    </label>
+                    {{ password_form.new_password2 }}
+                    {% if password_form.new_password2.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for err in password_form.new_password2.errors %}{{ err }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-secondary">
+                    Обновить пароль
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

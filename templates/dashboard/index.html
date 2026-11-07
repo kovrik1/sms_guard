@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+{% block title %}Панель мониторинга (Dashboard) — SMS Guard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h1 class="h3 fw-bold mb-1">
+            Панель мониторинга (Dashboard)
+            {% if summary.is_admin_view %}
+                <span class="badge bg-warning text-dark fs-6 ms-2">Общесистемная сводка (Администратор)</span>
+            {% endif %}
+        </h1>
+        <p class="text-muted mb-0">
+            {% if summary.is_admin_view %}
+                Агрегированная статистика по всем пользователям без отображения чужих текстов SMS (ФТ-1.9)
+            {% else %}
+                Сводная статистика ваших проверок SMS-сообщений и интернет-ссылок
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Переключатель периода: 7 / 30 / 90 дней (Задание 17 п. 6) -->
+    <div class="btn-group" role="group" aria-label="Период статистики">
+        <a href="?days=7" class="btn btn-sm {% if selected_days == 7 %}btn-primary{% else %}btn-outline-secondary{% endif %}">7 дней</a>
+        <a href="?days=30" class="btn btn-sm {% if selected_days == 30 %}btn-primary{% else %}btn-outline-secondary{% endif %}">30 дней</a>
+        <a href="?days=90" class="btn btn-sm {% if selected_days == 90 %}btn-primary{% else %}btn-outline-secondary{% endif %}">90 дней</a>
+    </div>
+</div>
+
+<!-- Карточки-счётчики (Задание 17 п. 1, Раздел 9.2) -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="sg-stat-card">
+            <div class="sg-stat-label">Всего SMS</div>
+            <div class="sg-stat-value text-primary" id="stat-total-sms">{{ summary.total_sms }}</div>
+            <div class="small text-muted mt-1">Всего проверок: {{ summary.total_checks }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="sg-stat-card">
+            <div class="sg-stat-label">Всего URL</div>
+            <div class="sg-stat-value text-info" id="stat-total-url">{{ summary.total_url }}</div>
+            <div class="small text-muted mt-1">Отдельных ссылок</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="sg-stat-card border-success border-opacity-50">
+            <div class="sg-stat-label">✓ Безопасные</div>
+            <div class="sg-stat-value text-success" id="stat-safe">{{ summary.safe_count }}</div>
+            <div class="small text-muted mt-1">Категория SAFE</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="sg-stat-card border-warning border-opacity-50">
+            <div class="sg-stat-label">⚠ Подозрительные</div>
+            <div class="sg-stat-value text-warning" id="stat-suspicious">{{ summary.suspicious_count }}</div>
+            <div class="small text-muted mt-1">Категория SUSPICIOUS</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="sg-stat-card border-danger border-opacity-50">
+            <div class="sg-stat-label">⛔ Мошеннические</div>
+            <div class="sg-stat-value text-danger" id="stat-fraudulent">{{ summary.fraudulent_count }}</div>
+            <div class="small text-muted mt-1">FRAUDULENT / DANGEROUS</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="sg-stat-card">
+            <div class="sg-stat-label">Средний Risk Score</div>
+            <div class="sg-stat-value" id="stat-avg-risk">{{ summary.avg_risk_score }}</div>
+            <div class="small text-muted mt-1">Шкала от 0 до 100</div>
+        </div>
+    </div>
+</div>
+
+{% if summary.total_checks == 0 %}
+<!-- Пустое состояние при отсутствии проверок (Задание 17 п. 9) -->
+<div class="sg-card p-5 text-center mb-4">
+    <div class="fs-1 mb-2">🔍</div>
+    <h2 class="h5 fw-bold">У вас пока нет выполненных проверок</h2>
+    <p class="text-secondary mb-4">
+        Отправьте подозрительное SMS-сообщение или интернет-ссылку на проверку, чтобы увидеть диаграммы и статистику.
+    </p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="{% url 'analysis:check_sms' %}" class="btn btn-primary">Проверить SMS-сообщение</a>
+        <a href="{% url 'analysis:check_url' %}" class="btn btn-outline-primary">Проверить ссылку (URL)</a>
+    </div>
+</div>
+{% else %}
+<!-- Графики Chart.js (Задание 17 п. 2, 3, 4) -->
+<div class="row g-4 mb-4">
+    <div class="col-12 col-lg-4">
+        <div class="sg-card p-4 h-100">
+            <h2 class="h6 fw-bold mb-3">Распределение по категориям</h2>
+            <div style="position: relative; height: 260px;">
+                <canvas id="chartCategories"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-8">
+        <div class="sg-card p-4 h-100">
+            <h2 class="h6 fw-bold mb-3">Динамика проверок по дням (за {{ selected_days }} дн.)</h2>
+            <div style="position: relative; height: 260px;">
+                <canvas id="chartDaily"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-12 col-lg-5">
+        <div class="sg-card p-4 h-100">
+            <h2 class="h6 fw-bold mb-3">Топ-5 сработавших признаков социальной инженерии</h2>
+            <div style="position: relative; height: 260px;">
+                <canvas id="chartTopFeatures"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Таблица последних 10 проверок (Задание 17 п. 5, Раздел 9.2) -->
+    <div class="col-12 col-lg-7">
+        <div class="sg-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h6 fw-bold mb-0">Последние проверки</h2>
+                <a href="{% url 'analysis:history' %}" class="btn btn-outline-secondary btn-sm">Вся история →</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 small">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Дата</th>
+                            <th>Тип</th>
+                            <th>Фрагмент</th>
+                            <th>Risk Score</th>
+                            <th>Категория</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in summary.recent_checks %}
+                        <tr>
+                            <td class="text-nowrap text-muted">{{ item.created_at }}</td>
+                            <td><span class="badge bg-secondary">{{ item.type }}</span></td>
+                            <td class="text-truncate" style="max-width: 210px;">{{ item.snippet }}</td>
+                            <td class="fw-bold">{{ item.risk_score }}/100</td>
+                            <td>
+                                {% if item.category == 'SAFE' %}
+                                    <span class="sg-badge sg-badge-safe">✓ Безопасное</span>
+                                {% elif item.category == 'SUSPICIOUS' %}
+                                    <span class="sg-badge sg-badge-suspicious">⚠ Подозрительное</span>
+                                {% elif item.category == 'DANGEROUS' %}
+                                    <span class="sg-badge sg-badge-dangerous">⛔ Опасная ссылка</span>
+                                {% else %}
+                                    <span class="sg-badge sg-badge-fraudulent">⛔ Мошенническое</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <a href="{% url 'analysis:check_detail' item.id %}" class="btn btn-sm btn-outline-primary">Разбор</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-3">У вас пока нет собственных проверок.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if summary.is_admin_view or summary.active_models %}
+<!-- Блок активных версий моделей с метриками из метаданных (Задание 17 п. 8) -->
+<div class="sg-card p-4 mb-2">
+    <h2 class="h6 fw-bold mb-3">🤖 Активные версии ML-моделей и метрики качества</h2>
+    <div class="row g-3">
+        {% for m in summary.active_models %}
+        <div class="col-12 col-md-6">
+            <div class="p-3 border rounded bg-light h-100">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold">{{ m.model_type_display }} (v{{ m.version }})</span>
+                    <span class="badge bg-success">Активна</span>
+                </div>
+                <div class="small text-secondary mb-2">
+                    <strong>Алгоритм:</strong> {{ m.algorithm }} · <strong>Порог:</strong> {{ m.threshold }}
+                </div>
+                {% if m.metrics %}
+                <div class="d-flex flex-wrap gap-2 small">
+                    {% for k, v in m.metrics.items %}
+                        <span class="badge bg-white text-dark border">{{ k }}: {{ v }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-muted small">Метаданные моделей ещё не зарегистрированы в базе данных.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% if summary.total_checks > 0 %}
+<script>
+(function() {
+    const summaryData = {{ summary_json|safe }};
+
+    // 1. Круговая диаграмма распределения категорий
+    const ctxCat = document.getElementById("chartCategories");
+    if (ctxCat) {
+        new Chart(ctxCat, {
+            type: "doughnut",
+            data: {
+                labels: ["Безопасные (SAFE)", "Подозрительные (SUSPICIOUS)", "Мошеннические / Опасные"],
+                datasets: [{
+                    data: [
+                        summaryData.safe_count || 0,
+                        summaryData.suspicious_count || 0,
+                        summaryData.fraudulent_count || 0
+                    ],
+                    backgroundColor: ["#16a34a", "#d97706", "#dc2626"],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: "bottom" },
+                    title: { display: false }
+                }
+            }
+        });
+    }
+
+    // 2. Линейный график проверок по дням с разбивкой по категориям
+    const ctxDaily = document.getElementById("chartDaily");
+    if (ctxDaily && Array.isArray(summaryData.daily)) {
+        const labels = summaryData.daily.map(d => d.label || d.date);
+        new Chart(ctxDaily, {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: "Безопасные",
+                        data: summaryData.daily.map(d => d.safe),
+                        borderColor: "#16a34a",
+                        backgroundColor: "rgba(22, 163, 74, 0.1)",
+                        tension: 0.25,
+                        fill: true
+                    },
+                    {
+                        label: "Подозрительные",
+                        data: summaryData.daily.map(d => d.suspicious),
+                        borderColor: "#d97706",
+                        backgroundColor: "rgba(217, 119, 6, 0.1)",
+                        tension: 0.25,
+                        fill: true
+                    },
+                    {
+                        label: "Мошеннические",
+                        data: summaryData.daily.map(d => d.fraudulent),
+                        borderColor: "#dc2626",
+                        backgroundColor: "rgba(220, 38, 38, 0.1)",
+                        tension: 0.25,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { title: { display: true, text: "Дата проверки" } },
+                    y: { beginAtZero: true, ticks: { precision: 0 }, title: { display: true, text: "Число проверок" } }
+                },
+                plugins: {
+                    legend: { position: "bottom" }
+                }
+            }
+        });
+    }
+
+    // 3. Столбчатая диаграмма топ-5 признаков СИ
+    const ctxFeat = document.getElementById("chartTopFeatures");
+    if (ctxFeat) {
+        const topFeats = Array.isArray(summaryData.top_features) ? summaryData.top_features : [];
+        new Chart(ctxFeat, {
+            type: "bar",
+            data: {
+                labels: topFeats.length ? topFeats.map(f => f.code) : ["Нет срабатываний"],
+                datasets: [{
+                    label: "Число срабатываний",
+                    data: topFeats.length ? topFeats.map(f => f.count) : [0],
+                    backgroundColor: "#2563eb",
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                indexAxis: "y",
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { beginAtZero: true, ticks: { precision: 0 }, title: { display: true, text: "Количество проверок" } },
+                    y: { title: { display: true, text: "Код признака" } }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+})();
+</script>
+{% endif %}
+{% endblock %}

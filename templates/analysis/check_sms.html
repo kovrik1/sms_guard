@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block title %}Проверка SMS-сообщения — SMS Guard{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="h3 fw-bold mb-1">Проверка SMS-сообщения</h1>
+    <p class="text-muted mb-0">
+        Интеллектуальный анализ текста сообщения (TF-IDF + правила социальной инженерии) и автоматическая проверка вложенных ссылок
+    </p>
+</div>
+
+{% if not models_loaded %}
+<!-- Уведомление при отсутствии файлов моделей (НФТ-14) -->
+<div class="alert alert-warning d-flex align-items-center gap-2 mb-4" role="alert">
+    <span class="fs-5">⚠️</span>
+    <div>
+        <strong>Внимание:</strong> Модели машинного обучения в данный момент не загружены или временно недоступны.
+        Интеллектуальный анализ сейчас не может быть выполнен.
+    </div>
+</div>
+{% endif %}
+
+<div class="sg-card p-4 mb-4">
+    <form id="sms-check-form" method="post" action="{% url 'analysis:check_sms' %}" novalidate>
+        {% csrf_token %}
+
+        <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+            <label for="sms-text-input" class="form-label fw-bold mb-0">
+                Текст входящего SMS-сообщения:
+            </label>
+            <span id="sms-char-counter" class="badge bg-light text-secondary border font-monospace">0 / 1000</span>
+        </div>
+
+        <textarea
+            id="sms-text-input"
+            name="text"
+            rows="5"
+            maxlength="1000"
+            class="form-control mb-2"
+            placeholder="Вставьте сюда текст подозрительного SMS-сообщения (до 1000 символов)..."
+            required
+        >{{ initial_text }}</textarea>
+
+        <!-- Ошибки валидации / сервера рядом с полем на русском языке (НФТ-11, Задание 15 п. 9) -->
+        <div id="sms-error-box" class="alert alert-danger py-2 small {% if not error_message %}d-none{% endif %}" role="alert">
+            {{ error_message }}
+        </div>
+
+        <!-- 3 кнопки-примера (Задание 15 п. 1) -->
+        <div class="mb-3 d-flex align-items-center flex-wrap gap-2">
+            <span class="small text-secondary me-1">Быстрые примеры:</span>
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-success"
+                data-sms-example="{{ examples.safe }}"
+            >
+                ✓ Пример: Безопасное
+            </button>
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-warning text-dark"
+                data-sms-example="{{ examples.suspicious }}"
+            >
+                ⚠ Пример: Подозрительное
+            </button>
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-danger"
+                data-sms-example="{{ examples.fraudulent }}"
+            >
+                ⛔ Пример: Мошенническое
+            </button>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <button type="submit" id="sms-submit-btn" class="btn btn-primary px-4 fw-semibold">
+                <span id="sms-loading-spinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                Проверить сообщение
+            </button>
+            <button type="button" id="sms-clear-btn" class="btn btn-outline-secondary">
+                Очистить
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Блок результата анализа (Раздел 9.3, Задание 15 п. 4-7) -->
+<div id="analysis-result-container" class="sg-card p-4 {% if not check %}d-none{% endif %}">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pb-3 mb-3 border-bottom">
+        <div>
+            <div class="small text-secondary mb-1">Итоговый вердикт системы:</div>
+            <span id="res-category-badge" class="sg-badge sg-badge-lg {% if check %}{% if check.category == 'SAFE' %}sg-badge-safe{% elif check.category == 'SUSPICIOUS' %}sg-badge-suspicious{% else %}sg-badge-fraudulent{% endif %}{% endif %}">
+                {% if check %}
+                    {% if check.category == 'SAFE' %}✓ БЕЗОПАСНОЕ СООБЩЕНИЕ{% elif check.category == 'SUSPICIOUS' %}⚠ ПОДОЗРИТЕЛЬНОЕ СООБЩЕНИЕ{% else %}⛔ МОШЕННИЧЕСКОЕ СООБЩЕНИЕ{% endif %}
+                {% endif %}
+            </span>
+        </div>
+        <div class="text-md-end">
+            <span id="res-risk-level" class="sg-badge {% if check %}sg-badge-{{ check.risk_level }}{% endif %} mb-1">
+                {% if check %}Уровень риска: {{ check.get_risk_level_display }}{% endif %}
+            </span>
+            <div class="small text-muted">
+                Язык сообщения: <strong id="res-language">{% if check %}{{ check.language }}{% endif %}</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- Предупреждение о языке для ru / kk (ФТ-2.8) -->
+    <div id="res-language-warning" class="alert alert-warning small py-2 {% if not check or not check.language_warning %}d-none{% endif %}">
+        {% if check and check.language_warning %}⚠ {{ check.language_warning }}{% endif %}
+    </div>
+
+    <!-- Шкала Risk Score и вероятности моделей -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-6">
+            <div class="p-3 border rounded bg-light h-100">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-semibold">Показатель риска (Risk Score):</span>
+                    <span id="res-risk-score-val" class="fs-5 fw-bold">{% if check %}{{ check.risk_score }} / 100{% else %}0 / 100{% endif %}</span>
+                </div>
+                <div class="sg-risk-meter">
+                    <div
+                        id="res-risk-bar"
+                        class="sg-risk-meter-fill {% if check %}sg-risk-fill-{{ check.risk_level }}{% else %}sg-risk-fill-LOW{% endif %}"
+                        style="width: {% if check %}{{ check.risk_score }}{% else %}0{% endif %}%;"
+                    ></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-3 border rounded bg-light h-100">
+                <div class="small text-secondary">Вероятность SMS-модели (P_sms)</div>
+                <div id="res-p-sms" class="fs-5 fw-bold mt-1">
+                    {% if check and check.p_sms != None %}{{ check.p_sms|floatformat:3 }}{% else %}—{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-3 border rounded bg-light h-100">
+                <div class="small text-secondary">Макс. риск ссылки (P_url)</div>
+                <div id="res-p-url" class="fs-5 fw-bold mt-1">
+                    {% if check and check.p_url_max != None %}{{ check.p_url_max|floatformat:3 }}{% else %}Ссылки не обнаружены{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Проверенный текст (выводится безопасно как текст, НФТ-5) -->
+    <div class="mb-3">
+        <div class="small fw-semibold text-secondary mb-1">Проверенный текст сообщения:</div>
+        <div id="res-input-display" class="p-3 bg-light border rounded font-monospace small">{% if check %}{{ check.display_text }}{% endif %}</div>
+    </div>
+
+    <!-- Найденные ссылки (некликабельный текст с выделенным доменом, ФТ-3.10) -->
+    <div id="res-urls-section" class="mb-3 {% if not check or not check.url_results.all %}d-none{% endif %}">
+        <div class="small fw-semibold text-secondary mb-2">Найденные в сообщении ссылки (не кликабельны, домен выделен):</div>
+        <div id="res-urls-list">
+            {% if check %}
+                {% for u in check.url_results.all %}
+                <div class="p-3 mb-2 border rounded bg-light d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <span class="url-nonclickable">{{ u.url }} (домен: <strong class="url-domain-highlight">{{ u.domain }}</strong>)</span>
+                    <span class="small fw-semibold">P_url = {{ u.p_url|floatformat:3 }} ({{ u.category }})</span>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Сработавшие признаки -->
+    <div class="mb-3">
+        <div class="small fw-semibold text-secondary mb-2">Обнаруженные подозрительные признаки:</div>
+        <div id="res-features-list">
+            {% if check %}
+                {% for df in check.detected_features.all %}
+                    <span class="badge bg-secondary me-2 mb-2 py-2 px-3">{{ df.code }}: {{ df.title }}</span>
+                {% empty %}
+                    <span class="text-muted">Специфические маркеры социальной инженерии не сработали.</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Объяснение результата -->
+    <div class="mb-3">
+        <div class="small fw-semibold text-secondary mb-2">Почему присвоен такой результат (объяснение):</div>
+        <ul id="res-explanation-list" class="list-group">
+            {% if check %}
+                {% for reason in check.explanation %}
+                    <li class="list-group-item">{{ reason }}</li>
+                {% endfor %}
+            {% endif %}
+        </ul>
+    </div>
+
+    <!-- Рекомендация пользователю -->
+    <div class="alert alert-info mb-3">
+        <strong>💡 Рекомендация:</strong>
+        <span id="res-recommendation">{% if check %}{{ check.recommendation }}{% endif %}</span>
+    </div>
+
+    <!-- Предупреждение о вероятностном характере оценки (Раздел 2.5) -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-2 border-top small text-muted">
+        <span id="res-disclaimer">Оценка носит вероятностный характер и не гарантирует безопасность</span>
+        <a id="res-detail-link" href="{% if check %}{% url 'analysis:check_detail' check.id %}{% else %}#{% endif %}" class="btn btn-sm btn-outline-primary {% if not check %}d-none{% endif %}">
+            Открыть страницу полного разбора →
+        </a>
+    </div>
+</div>
+{% endblock %}
