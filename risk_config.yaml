@@ -1,0 +1,51 @@
+# Конфигурация расчёта уровня риска (Задание 13, раздел 2.5 ТЗ)
+
+# Базовые веса формулы Risk Score и максимальное число групп СИ для насыщения S_se
+w1: 0.5
+w2: 0.3
+w3: 0.2
+se_max_groups: 3
+
+weights:
+  w1: 0.5
+  w2: 0.3
+  w3: 0.2
+  se_max_groups: 3
+
+# Пороги вероятности URL-модели (SAFE < url_t1 <= SUSPICIOUS < url_t2 <= DANGEROUS)
+url_t1: 0.38
+url_t2: 0.65
+
+url_thresholds:
+  url_t1: 0.38
+  url_t2: 0.65
+
+# Границы уровней риска:
+# 0..low_max -> LOW (SAFE)
+# (low_max+1)..medium_max -> MEDIUM (SUSPICIOUS)
+# (medium_max+1)..100 -> HIGH (FRAUDULENT / DANGEROUS)
+low_max: 34
+medium_max: 69
+
+levels:
+  low_max: 34
+  medium_max: 69
+
+# Правила принудительного усиления риска (overrides)
+overrides:
+  code_request_min_score: 70
+  both_models_high_p_sms: 0.8
+  both_models_high_min_score: 85
+  ip_or_punycode_or_brand_min_score: 60
+  multiple_se_groups_count: 2
+  multiple_se_groups_min_score: 72
+  se_plus_suspicious_url_min_score: 75
+
+# Шаблоны рекомендаций пользователю по уровню риска
+recommendations:
+  LOW: "Признаки мошенничества не обнаружены или незначительны. Соблюдайте базовую осторожность и никому не сообщайте коды подтверждения."
+  MEDIUM: "Обнаружены подозрительные признаки. Не переходите по незнакомым ссылкам, не вводите данные карты и перепроверьте информацию по официальному номеру организации."
+  HIGH: "Не переходите по ссылке, не сообщайте коды и данные карты. Свяжитесь с банком по номеру с обратной стороны карты."
+
+# Обязательное предупреждение о вероятностном характере оценки
+disclaimer: "Оценка носит вероятностный характер и не гарантирует безопасность"
