@@ -22,6 +22,7 @@ from __future__ import annotations
 import json
 import logging
 import math
+import re
 import threading
 from pathlib import Path
 from typing import Any
@@ -568,9 +569,18 @@ class ModelPredictor:
                         has_se = bool(detect_se_rules(raw_text))
                     except Exception:
                         has_se = False
-                    if not has_se and "<url>" not in model_input and "<money>" not in model_input:
-                        import re as _re
-                        model_input = _re.sub(r"<num>|\bnum\b", "", model_input).strip()
+                    # Крупные суммы ("50 000", "30 000", 5+ цифр) — признак
+                    # мошенничества: плейсхолдеры <num> в таких SMS не вырезаем.
+                    has_amount = bool(
+                        re.search(r"\d{1,3}(?:[\s\u00a0.,]\d{3})+|\d{5,}", raw_text)
+                    )
+                    if (
+                        not has_se
+                        and not has_amount
+                        and "<url>" not in model_input
+                        and "<money>" not in model_input
+                    ):
+                        model_input = re.sub(r"<num>|\bnum\b", "", model_input).strip()
             except Exception:
                 pass
 
