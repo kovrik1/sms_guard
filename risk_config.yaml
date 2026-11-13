@@ -13,12 +13,12 @@ weights:
   se_max_groups: 3
 
 # Пороги вероятности URL-модели (SAFE < url_t1 <= SUSPICIOUS < url_t2 <= DANGEROUS)
-url_t1: 0.38
-url_t2: 0.65
+url_t1: 0.35
+url_t2: 0.50
 
 url_thresholds:
-  url_t1: 0.38
-  url_t2: 0.65
+  url_t1: 0.35
+  url_t2: 0.50
 
 # Границы уровней риска:
 # 0..low_max -> LOW (SAFE)

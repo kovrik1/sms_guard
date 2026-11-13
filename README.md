@@ -98,7 +98,7 @@ curl -u demo_user:DemoPass123! -X POST http://127.0.0.1:8000/api/v1/check/sms/ \
 # Проверка отдельного URL
 curl -u demo_user:DemoPass123! -X POST http://127.0.0.1:8000/api/v1/check/url/ \
   -H "Content-Type: application/json" \
-  -d '{"url": "http://xn--exmplecua.test/secure/login?verify=1"}'
+  -d '{"url": "http://xn--exmple-cua.test/secure/login?verify=1"}'
 ```
 
 ---

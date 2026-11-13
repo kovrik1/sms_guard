@@ -4,6 +4,7 @@
 """
 from __future__ import annotations
 
+import time
 from datetime import timedelta
 from pathlib import Path
 
@@ -19,6 +20,7 @@ from apps.accounts.models import UserProfile, get_or_create_profile
 from apps.analysis import services as analysis_services
 from apps.analysis.models import Check, DetectedFeature, UrlResult
 from config.exceptions import ModelUnavailableError
+from ml.risk import load_risk_config
 
 pytestmark = pytest.mark.django_db
 
@@ -689,3 +691,108 @@ def test_23_missing_models_return_503_service_unavailable(
     health_resp = auth_client_a.get("/api/v1/health/")
     assert health_resp.status_code == 200
     assert health_resp.data["models_loaded"] is False
+
+
+# ==============================================================================
+# 5. Согласованность URL-анализа, дедупликация, OpenAPI и производительность
+#    (НФТ-2, НФТ-3, Задание 14 п. 8)
+# ==============================================================================
+
+
+class _BoundaryUrlPredictor:
+    """Predictor stub returning a DANGEROUS category at the calibrated boundary."""
+
+    def predict_url(self, url: str) -> dict:
+        return {"p_url": 0.55, "category": "DANGEROUS"}
+
+    def get_model_versions(self) -> dict[str, str]:
+        return {"sms": "test", "url": "test"}
+
+
+def test_24_analyze_url_syncs_recommendation_and_category_at_boundary(
+    monkeypatch,
+):
+    """Граница p_url=0.55 (u_cat=DANGEROUS) даёт HIGH-риск, DANGEROUS-категорию и HIGH-рекомендацию."""
+    monkeypatch.setattr(
+        analysis_services, "_get_predictor", lambda: _BoundaryUrlPredictor()
+    )
+
+    recommendations = load_risk_config()["recommendations"]
+    for url in (
+        "https://www.example.com/account-check",
+        "http://secure-bank-verify.example/login",
+    ):
+        result = analysis_services.analyze_url(url)
+        assert result.p_url_max == 0.55
+        assert result.category == "DANGEROUS"
+        assert result.risk_level == "HIGH"
+        assert result.risk_score >= 70
+        assert result.recommendation == recommendations["HIGH"]
+        assert result.recommendation != recommendations["MEDIUM"]
+        assert any("как опасную" in reason for reason in result.explanation)
+
+
+def test_25_duplicate_url_submission_prevention_on_double_click(
+    auth_client_a: APIClient, user_a: User
+):
+    """НФТ-3: Повторная отправка того же URL не создаёт вторую запись в БД."""
+    payload = {"url": "https://www.example.com/duplicate-url-check-unique"}
+    r1 = auth_client_a.post("/api/v1/check/url/", payload, format="json")
+    r2 = auth_client_a.post("/api/v1/check/url/", payload, format="json")
+
+    assert r1.status_code == 200
+    assert r2.status_code == 200
+    assert r1.data["id"] == r2.data["id"]
+    assert Check.objects.filter(user=user_a, check_type=Check.TYPE_URL).count() == 1
+
+
+def test_26_openapi_schema_generated_without_errors():
+    """Задание 14 п. 8: GET /api/schema/ возвращает 200 и содержит ключевые эндпоинты /api/v1/."""
+    resp = Client().get("/api/schema/")
+    assert resp.status_code == 200
+
+    schema_text = resp.content.decode("utf-8")
+    for expected_path in (
+        "/api/v1/auth/register/",
+        "/api/v1/auth/login/",
+        "/api/v1/auth/logout/",
+        "/api/v1/check/sms/",
+        "/api/v1/check/url/",
+        "/api/v1/checks/",
+        "/api/v1/checks/{id}/",
+        "/api/v1/health/",
+        "/api/v1/stats/summary/",
+    ):
+        assert expected_path in schema_text, f"Missing {expected_path} in schema"
+
+
+def test_27_dashboard_and_stats_performance_with_1000_checks(
+    client: Client, user_a: User
+):
+    """НФТ-2: При 1000 записях дашборд, история и статистика отвечают 200 быстрее 2 секунд."""
+    Check.objects.bulk_create(
+        [
+            Check(
+                user=user_a,
+                check_type=Check.TYPE_SMS if i % 2 == 0 else Check.TYPE_URL,
+                input_masked=f"Нагрузочная запись #{i}",
+                language="ru",
+                category=Check.CATEGORY_SAFE if i % 2 == 0 else Check.CATEGORY_FRAUDULENT,
+                risk_level=Check.RISK_LOW if i % 2 == 0 else Check.RISK_HIGH,
+                risk_score=10 if i % 2 == 0 else 90,
+                p_sms=0.05 if i % 2 == 0 else 0.9,
+                recommendation="",
+                submission_hash=f"perf_{i}",
+            )
+            for i in range(1000)
+        ]
+    )
+    assert Check.objects.filter(user=user_a).count() == 1000
+
+    client.force_login(user_a)
+    for page_url in ("/", "/history/", "/stats/", "/api/v1/stats/summary/"):
+        started = time.perf_counter()
+        resp = client.get(page_url)
+        elapsed = time.perf_counter() - started
+        assert resp.status_code == 200, f"{page_url} returned {resp.status_code}"
+        assert elapsed < 2.0, f"{page_url} took {elapsed:.3f}s (limit 2.0s)"

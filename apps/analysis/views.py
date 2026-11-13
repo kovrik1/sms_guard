@@ -16,6 +16,8 @@ from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -400,6 +402,15 @@ class CheckSmsAPIView(APIView):
     permission_classes = [IsAuthenticated]
     throttle_classes = [CheckUserRateThrottle]
 
+    @extend_schema(
+        request=CheckSmsInputSerializer,
+        responses={
+            200: CheckDetailSerializer,
+            400: OpenApiTypes.OBJECT,
+            503: OpenApiTypes.OBJECT,
+        },
+        description="Analyze an SMS message and persist the check result.",
+    )
     def post(self, request, *args, **kwargs):
         serializer = CheckSmsInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -423,6 +434,15 @@ class CheckUrlAPIView(APIView):
     permission_classes = [IsAuthenticated]
     throttle_classes = [CheckUserRateThrottle]
 
+    @extend_schema(
+        request=CheckUrlInputSerializer,
+        responses={
+            200: CheckDetailSerializer,
+            400: OpenApiTypes.OBJECT,
+            503: OpenApiTypes.OBJECT,
+        },
+        description="Analyze a standalone URL and persist the check result.",
+    )
     def post(self, request, *args, **kwargs):
         serializer = CheckUrlInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -470,6 +490,10 @@ class CheckDetailDeleteAPIView(APIView):
             user=request.user,
         )
 
+    @extend_schema(
+        responses={200: CheckDetailSerializer, 404: OpenApiTypes.OBJECT},
+        description="Retrieve a check belonging to the current user.",
+    )
     def get(self, request, pk: int, *args, **kwargs):
         check = self.get_object(request, pk)
         return Response(
@@ -477,6 +501,14 @@ class CheckDetailDeleteAPIView(APIView):
             status=status.HTTP_200_OK,
         )
 
+    @extend_schema(
+        request=None,
+        responses={
+            204: OpenApiResponse(description="Check deleted."),
+            404: OpenApiTypes.OBJECT,
+        },
+        description="Delete a check belonging to the current user.",
+    )
     def delete(self, request, pk: int, *args, **kwargs):
         check = self.get_object(request, pk)
         check.delete()
@@ -488,5 +520,9 @@ class HealthAPIView(APIView):
 
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        responses={200: OpenApiTypes.OBJECT},
+        description="Return application and ML model availability status.",
+    )
     def get(self, request, *args, **kwargs):
         return Response(get_health_status(), status=status.HTTP_200_OK)

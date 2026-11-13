@@ -13,6 +13,8 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -226,6 +228,14 @@ class RegisterAPIView(APIView):
 
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        request=RegisterSerializer,
+        responses={
+            201: UserSerializer,
+            400: OpenApiTypes.OBJECT,
+        },
+        description="Register a new user and start an authenticated session.",
+    )
     def post(self, request, *args, **kwargs):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -244,6 +254,15 @@ class LoginAPIView(APIView):
 
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        request=LoginSerializer,
+        responses={
+            200: UserSerializer,
+            401: OpenApiTypes.OBJECT,
+            429: OpenApiTypes.OBJECT,
+        },
+        description="Authenticate a user with brute-force lockout protection.",
+    )
     def post(self, request, *args, **kwargs):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -291,6 +310,11 @@ class LogoutAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        request=None,
+        responses={204: OpenApiResponse(description="Session destroyed.")},
+        description="Destroy the current authenticated session.",
+    )
     def post(self, request, *args, **kwargs):
         user_id = request.user.id
         logout(request)

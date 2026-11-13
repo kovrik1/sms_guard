@@ -16,6 +16,8 @@ from django.db.models.functions import TruncDate
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -285,6 +287,10 @@ class StatsSummaryAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        responses={200: OpenApiTypes.OBJECT},
+        description="Return aggregated dashboard statistics and chart data.",
+    )
     def get(self, request, *args, **kwargs):
         try:
             days = int(request.query_params.get("days", 30))

@@ -18,7 +18,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.utils import timezone
 
-from apps.accounts.models import get_or_create_profile
+from apps.accounts.models import UserProfile, get_or_create_profile
 from config.exceptions import ModelUnavailableError
 from .models import (
     DISCLAIMER_TEXT,
@@ -240,7 +240,7 @@ def _parse_sms_prediction(raw_pred: Any) -> float:
     return 0.0
 
 
-def _parse_url_prediction(raw_pred: Any, t1: float = 0.4, t2: float = 0.7) -> tuple[float, str]:
+def _parse_url_prediction(raw_pred: Any, t1: float = 0.35, t2: float = 0.50) -> tuple[float, str]:
     """Extract (p_url, category) from predictor.predict_url output."""
     p_url = 0.0
     category = ""
@@ -663,12 +663,35 @@ def analyze_url(url: str) -> AnalysisResult:
         category = "DANGEROUS"
         risk_level = "HIGH"
         risk_score = max(risk_score, 70)
+        # A HIGH risk must never be returned with a LOW/MEDIUM explanation stub.
+        low_medium_stubs = {
+            "Признаки мошенничества, социальной инженерии и опасных ссылок не обнаружены",
+            "Обнаружены отдельные подозрительные признаки, требующие осторожности",
+            "Подозрительных признаков мошенничества и опасных ссылок не обнаружено.",
+            "Обнаружены отдельные подозрительные признаки в тексте или структуре ссылки.",
+        }
+        meaningful = [reason for reason in explanation if reason not in low_medium_stubs]
+        explanation = meaningful or [
+            f"ML-модель классифицировала ссылку как опасную (P_url = {p_url:.2f})"
+        ]
     elif u_cat == "SUSPICIOUS" or risk_level == "MEDIUM":
         category = "SUSPICIOUS"
         risk_level = "MEDIUM"
         risk_score = max(35, min(69, risk_score if risk_score >= 35 else int(round(p_url * 100))))
     else:
         category = "SAFE"
+
+    # Keep recommendation consistent with the final (possibly overridden) risk level.
+    try:
+        from ml.risk import load_risk_config
+
+        configured_recommendations = load_risk_config().get("recommendations", {})
+    except Exception:
+        configured_recommendations = {}
+    recommendation = (
+        configured_recommendations.get(risk_level)
+        or DEFAULT_RECOMMENDATIONS.get(risk_level, DEFAULT_RECOMMENDATIONS["LOW"])
+    )
 
     urls_results = [
         {
@@ -728,6 +751,11 @@ def save_analysis_result(
     cutoff = timezone.now() - timedelta(seconds=window_seconds)
 
     with transaction.atomic():
+        # Ensure the user's profile row exists and lock it to serialize
+        # duplicate-submission checks on simultaneous double-click requests (НФТ-3).
+        get_or_create_profile(user)
+        profile = UserProfile.objects.select_for_update().get(user=user)
+
         if created_at_override is None:
             existing = (
                 Check.objects.filter(
@@ -747,7 +775,6 @@ def save_analysis_result(
                 )
                 return existing
 
-        profile = get_or_create_profile(user)
         if result.type == Check.TYPE_SMS:
             input_masked = mask_sensitive_text(normalized_raw)
             input_text = normalized_raw if profile.store_sms_text else None

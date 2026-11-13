@@ -192,6 +192,10 @@ SPECTACULAR_SETTINGS = {
     ),
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "CheckCategoryEnum": "apps.analysis.models.Check.CATEGORY_CHOICES",
+        "UrlResultCategoryEnum": "apps.analysis.models.UrlResult.CATEGORY_CHOICES",
+    },
 }
 
 # Logging configuration (НФТ-9, НФТ-13, Задание 2 п. 6)

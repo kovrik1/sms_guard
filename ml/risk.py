@@ -158,8 +158,8 @@ def load_risk_config(config_path: str | Path | None = None) -> dict[str, Any]:
         "w2": float(_pick_param(raw_cfg, "weights", "w2", 0.3)),
         "w3": float(_pick_param(raw_cfg, "weights", "w3", 0.2)),
         "se_max_groups": float(_pick_param(raw_cfg, "weights", "se_max_groups", 3)),
-        "url_t1": float(_pick_param(raw_cfg, "url_thresholds", "url_t1", 0.38)),
-        "url_t2": float(_pick_param(raw_cfg, "url_thresholds", "url_t2", 0.65)),
+        "url_t1": float(_pick_param(raw_cfg, "url_thresholds", "url_t1", 0.35)),
+        "url_t2": float(_pick_param(raw_cfg, "url_thresholds", "url_t2", 0.50)),
         "low_max": int(_pick_param(raw_cfg, "levels", "low_max", 34)),
         "medium_max": int(_pick_param(raw_cfg, "levels", "medium_max", 69)),
         "overrides": {
@@ -418,7 +418,7 @@ def compute_risk(
         )
 
     if p_url_val is not None and p_url_val >= url_t1:
-        url_label = "опасной" if p_url_val >= url_t2 else "подозрительной"
+        url_label = "опасную" if p_url_val >= url_t2 else "подозрительную"
         candidates.append(
             (
                 w2 * p_url_val + 0.45,

@@ -155,7 +155,7 @@ def test_override_code_request_min_70() -> None:
 
 
 def test_override_both_models_high_min_85() -> None:
-    """При P_sms >= 0.8 и P_url_max >= url_t2 (0.65) итоговый Risk Score не ниже 85."""
+    """При P_sms >= 0.8 и P_url_max >= url_t2 (0.50) итоговый Risk Score не ниже 85."""
     res = compute_risk(p_sms=0.82, p_url_max=0.66, se_groups=[])
     assert res.risk_score >= 85
     assert res.risk_level == "HIGH"
@@ -239,6 +239,33 @@ def test_dynamic_risk_config_reload_changes_result(tmp_path: Path) -> None:
     assert res_updated.risk_level == "LOW"
     assert res_updated.category == "SAFE"
     assert res_updated.recommendation == "Кастомная рекомендация LOW"
+
+
+def test_url_explanation_uses_correct_adjective_declension() -> None:
+    """Объяснение использует винительный падеж: «как опасную» / «как подозрительную»."""
+    suspicious_res = compute_risk(
+        p_sms=None,
+        p_url_max=0.40,
+        se_groups=[],
+        url_flags={},
+        is_url_only=True,
+    )
+    assert any(
+        "классифицировала ссылку как подозрительную" in reason
+        for reason in suspicious_res.explanation
+    )
+
+    dangerous_res = compute_risk(
+        p_sms=None,
+        p_url_max=0.85,
+        se_groups=[],
+        url_flags={},
+        is_url_only=True,
+    )
+    assert any(
+        "классифицировала ссылку как опасную" in reason
+        for reason in dangerous_res.explanation
+    )
 
 
 def test_language_unreliable_warning_and_max_6_reasons() -> None:
@@ -373,7 +400,7 @@ def test_demo_messages_section_8_3() -> None:
     assert r12.risk_level == "LOW"
 
     # 13. URL — Опасная ссылка (Punycode + ключевые слова)
-    url13 = "http://xn--exmplecua.test/secure/login?verify=1"
+    url13 = "http://xn--exmple-cua.test/secure/login?verify=1"
     u13 = extract_url_features(url13)
     r13 = compute_risk(None, 0.85, [], u13, is_url_only=True)
     assert r13.category == "DANGEROUS"

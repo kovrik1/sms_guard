@@ -58,7 +58,7 @@ DEMO_SAMPLES: list[tuple[str, str]] = [
         "Ваша посылка ожидает оплаты таможенного сбора 350 ₸: http://post-delivery-pay.example",
     ),
     ("URL", "https://www.example.com/about"),
-    ("URL", "http://xn--exmplecua.test/secure/login?verify=1"),
+    ("URL", "http://xn--exmple-cua.test/secure/login?verify=1"),
     # --- Additional synthetic samples for 30-day history & pagination (22 more = 35 total) ---
     ("SMS", "Напоминаем: приём у врача завтра в 14:30, кабинет 204."),
     ("SMS", "Dear colleague, the project meeting is moved to 15:00 in room 3B."),

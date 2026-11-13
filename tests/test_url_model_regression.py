@@ -32,7 +32,7 @@ REAL_SAFE_URLS: list[str] = [
 
 PHISHING_URLS: list[str] = [
     "http://192.0.2.15/account-update",
-    "http://xn--exmplecua.test/secure/login?verify=1",
+    "http://xn--exmple-cua.test/secure/login?verify=1",
     "http://user@evil-login-pay.click:8080//confirm",
     "bit.ly/prize-claim-test",
     "https://bit.ly/3xYz987",
